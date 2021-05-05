@@ -13,12 +13,14 @@ import { ipfsPlugin } from "@web3api/ipfs-plugin-js";
 
 const optionsString = intlMsg.commands_build_options_options();
 const scriptStr = intlMsg.commands_create_options_recipeScript();
+const pathStr = intlMsg.commands_build_options_o_path();
 
 const HELP = `
 ${chalk.bold("w3 query")} [${optionsString}] ${chalk.bold(`<${scriptStr}>`)}
 
 ${optionsString[0].toUpperCase() + optionsString.slice(1)}:
-  -t, --test-ens  ${intlMsg.commands_build_options_t()}
+  -t, --test-ens          ${intlMsg.commands_build_options_t()}
+  -r, --redirects <${pathStr}>  ${intlMsg.commands_query_options_r()}
 `;
 
 export default {
@@ -27,9 +29,11 @@ export default {
   run: async (toolbox: GluegunToolbox): Promise<void> => {
     const { filesystem, parameters, print } = toolbox;
     // eslint-disable-next-line prefer-const
-    let { t, testEns } = parameters.options;
+    const { t, r } = parameters.options;
+    let { testEns, redirects } = parameters.options;
 
     testEns = testEns || t;
+    redirects = redirects || r;
 
     let recipePath;
     try {
@@ -60,58 +64,78 @@ export default {
       return;
     }
 
-    let ipfsProvider = "";
-    let ethereumProvider = "";
-    let ensAddress = "";
-
-    try {
-      const {
-        data: { ipfs, ethereum },
-      } = await axios.get("http://localhost:4040/providers");
-      ipfsProvider = ipfs;
-      ethereumProvider = ethereum;
-      const { data } = await axios.get("http://localhost:4040/ens");
-      ensAddress = data.ensAddress;
-    } catch (e) {
-      print.error(`w3 test-env not found, please run "w3 test-env up"`);
+    if (redirects === true) {
+      print.error(
+        intlMsg.commands_create_error_outputDirMissingPath({
+          option: "redirects",
+          argument: "path",
+        })
+      );
+      print.info(HELP);
       return;
     }
 
-    // TODO: move this into its own package, since it's being used everywhere?
-    // maybe have it exported from test-env.
-    const redirects: UriRedirect[] = [
-      {
-        from: "w3://ens/ethereum.web3api.eth",
-        to: ethereumPlugin({
-          networks: {
-            testnet: {
-              provider: ethereumProvider,
-            },
-            mainnet: {
-              provider:
-                "https://mainnet.infura.io/v3/b00b2c2cc09c487685e9fb061256d6a6",
-            },
-          },
-        }),
-      },
-      {
-        from: "w3://ens/ipfs.web3api.eth",
-        to: ipfsPlugin({
-          provider: ipfsProvider,
-          fallbackProviders: ["https://ipfs.io"],
-        }),
-      },
-      {
-        from: "w3://ens/ens.web3api.eth",
-        to: ensPlugin({
-          addresses: {
-            testnet: ensAddress,
-          },
-        }),
-      },
-    ];
+    let clientRedirects: UriRedirect[];
+    if (redirects) {
+      try {
+        const resolvedPath: string = filesystem.resolve(redirects);
+        clientRedirects = await import(resolvedPath);
+      } catch (e) {
+        print.error(intlMsg.commands_query_error_badRedirects());
+        return;
+      }
+    } else {
+      let ipfsProvider = "";
+      let ethereumProvider = "";
+      let ensAddress = "";
 
-    const client = new Web3ApiClient({ redirects });
+      try {
+        const {
+          data: { ipfs, ethereum },
+        } = await axios.get("http://localhost:4040/providers");
+        ipfsProvider = ipfs;
+        ethereumProvider = ethereum;
+        const { data } = await axios.get("http://localhost:4040/ens");
+        ensAddress = data.ensAddress;
+      } catch (e) {
+        print.error(intlMsg.commands_query_error_noTestEnv());
+        return;
+      }
+
+      clientRedirects = [
+        {
+          from: "w3://ens/ethereum.web3api.eth",
+          to: ethereumPlugin({
+            networks: {
+              testnet: {
+                provider: ethereumProvider,
+              },
+              mainnet: {
+                provider:
+                  "https://mainnet.infura.io/v3/b00b2c2cc09c487685e9fb061256d6a6",
+              },
+            },
+          }),
+        },
+        {
+          from: "w3://ens/ipfs.web3api.eth",
+          to: ipfsPlugin({
+            provider: ipfsProvider,
+            fallbackProviders: ["https://ipfs.io"],
+          }),
+        },
+        {
+          from: "w3://ens/ens.web3api.eth",
+          to: ensPlugin({
+            addresses: {
+              testnet: ensAddress,
+            },
+          }),
+        },
+      ];
+    }
+
+    const client = new Web3ApiClient({ redirects: clientRedirects });
 
     const recipe = JSON.parse(filesystem.read(recipePath) as string);
     const dir = path.dirname(recipePath);

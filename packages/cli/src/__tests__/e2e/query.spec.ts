@@ -7,7 +7,8 @@ const HELP = `
 w3 query [options] <recipe-script>
 
 Options:
-  -t, --test-ens  Use the development server's ENS instance
+  -t, --test-ens          Use the development server's ENS instance
+  -r, --redirects <path>  Use custom redirects
 
 `;
 
@@ -102,5 +103,15 @@ mutation {
       args: ["test-env", "down"],
       cwd: projectRoot
     }, "../../../bin/w3");
+  }, 240000);
+
+  test("Should successfully return response using custom redirects", async () => {
+    const { exitCode: code, stdout: output, stderr: queryErr } = await runCLI({
+      args: ["query", "./recipes/e2e_redirects.json", "--redirects", "./custom-redirects.js"],
+      cwd: projectRoot
+    }, "../../../bin/w3");
+    expect(code).toEqual(0);
+    expect(queryErr).toBe("");
+    expect(clearStyle(output)).toContain("\"getData\": 123");
   }, 240000);
 });
