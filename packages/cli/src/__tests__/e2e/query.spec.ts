@@ -104,6 +104,10 @@ mutation {
       cwd: projectRoot
     }, "../../../bin/w3");
   }, 240000);
+});
+
+describe("e2e tests for query command (custom redirects)", () => {
+  const projectRoot = path.resolve(__dirname, "../project/");
 
   test("Should successfully return response using custom redirects", async () => {
     const { exitCode: code, stdout: output, stderr: queryErr } = await runCLI({

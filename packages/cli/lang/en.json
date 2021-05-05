@@ -28,7 +28,7 @@
   "commands_codegen_options_genFile": "Generation file",
   "commands_codegen_options_genFilePath": "Path to the generation file (default",
   "commands_codegen_options_h": "Show usage information",
-  "commands_codegen_options_i": "IPFS node to load external schemas (default: dev-server's node)",
+  "commands_codegen_options_i": "IPFS node to load external schemas (default: dev-server's node | public gateway)",
   "commands_codegen_options_i_node": "node",
   "commands_codegen_options_m": "Path to the Web3API manifest file (default",
   "commands_build_options_manifest": "manifest",
