@@ -150,6 +150,26 @@ ${HELP}`);
     expect(sanitizedOutput).toContain("ipfs:");
   });
 
+  test.only("Accepts .env file", async () => {
+    const { exitCode: code, stdout: output, stderr } = await runCLI(
+      {
+        args: ["env", "config", "web3api.envfile.yaml"],
+        cwd: projectRoot,
+      },
+      w3Cli
+    );
+
+    console.log(stderr)
+    console.log(output)
+
+    const sanitizedOutput = clearStyle(output);
+
+    expect(code).toEqual(0);
+    expect(sanitizedOutput).toContain("services:");
+    expect(sanitizedOutput).toContain("dev-server:");
+    expect(sanitizedOutput).toContain("ipfs:");
+  });
+
   test("Sets environment up with all modules if no --modules are passed", async () => {
     await runCLI(
       {

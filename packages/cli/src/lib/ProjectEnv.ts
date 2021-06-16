@@ -317,16 +317,20 @@ export class ProjectEnv {
       "docker-compose.yml"
     );
     const manifest = await this.getEnvManifest();
-    const env = manifest.env || {};
+    const envVars = manifest.env || {};
+    const envFile = manifest.envFile;
+
     const modulePaths = await this.getCorrectedDockerComposePaths();
-    const envKeys = Object.keys(env);
+    const envKeys = Object.keys(envVars);
 
     return `${envKeys
       .map(
         (key, i) =>
-          `export ${key}=${env[key]} ${i < envKeys.length ? "&& " : ""}`
+          `export ${key}=${envVars[key]} ${i < envKeys.length ? "&& " : ""}`
       )
-      .join("")} docker-compose -f ${baseComposePath} ${modulePaths
+      .join("")} docker-compose ${
+      envFile ? `--env-file=${envFile}` : ""
+    } -f ${baseComposePath} ${modulePaths
       .map((path) => ` -f ${path}`)
       .join("")}`;
   }

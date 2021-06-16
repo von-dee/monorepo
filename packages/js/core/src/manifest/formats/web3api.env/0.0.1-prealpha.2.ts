@@ -16,6 +16,7 @@ export interface EnvManifest {
      */
     [k: string]: string | number;
   };
+  envFile?: string;
   modules?: {
     name: string;
     dockerComposePath?: string;

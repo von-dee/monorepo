@@ -19,6 +19,9 @@
       },
       "additionalProperties": false
     },
+    "envFile": {
+      "type": "string"
+    },
     "modules": {
       "type": "array",
       "items": {
