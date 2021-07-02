@@ -22,13 +22,8 @@ export function queryMethodWrapped(argsBuf: ArrayBuffer): ArrayBuffer {
   return serializequeryMethodResult(result);
 }
 
-export function objectMethodWrapped(argsBuf: ArrayBuffer): ArrayBuffer {
-  const args = deserializeobjectMethodArgs(argsBuf);
-  const result = objectMethod({
-    object: args.object,
-    optObject: args.optObject,
-    objectArray: args.objectArray,
-    optObjectArray: args.optObjectArray
-  });
+export function objectMethodWrapped(inputPtr): ArrayBuffer {
+  // const input: Input_objectMethod = changetype<Input_objectMethod>(inputPtr)
+  const result = objectMethod(input);
   return serializeobjectMethodResult(result);
 }

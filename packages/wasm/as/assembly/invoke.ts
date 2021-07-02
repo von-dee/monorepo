@@ -25,7 +25,7 @@ export function w3_add_invoke(method: string, fn: InvokeFunction): void {
 }
 
 // Helper for handling _w3_invoke
-export function w3_invoke(method_size: u32, args_size: u32): bool {
+export function w3_invoke(method_size: u32, input_ptr: u32): bool {
   const msg = "HERE";
   const msgBuf = String.UTF8.encode(msg);
   __w3_log(changetype<u32>(msgBuf), msgBuf.byteLength);
@@ -59,4 +59,13 @@ export function w3_invoke(method_size: u32, args_size: u32): bool {
     );
     return false;
   }
+}
+
+export function w3_invoke_deserialize(method_size: u32, args_size: u32) {
+  // TODO:
+  // get the method name
+  // get the method args buffer
+
+  // const inputPtr = invokeDeserializers[method](argsBuff) -> return PTR to "class Input_sendTransaction"
+  // return inputPtr;
 }
