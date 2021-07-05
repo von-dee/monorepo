@@ -5,6 +5,7 @@
 import {
   ExternalImport,
   LocalImport,
+  QueryType,
   SchemaResolver,
   SchemaResolvers,
   SYNTAX_REFERENCE,
@@ -14,33 +15,33 @@ import { renderSchema } from "./render";
 import { addHeader } from "./templates/header.mustache";
 
 import {
-  TypeInfo,
-  parseSchema,
-  ObjectDefinition,
-  ImportedObjectDefinition,
-  QueryDefinition,
-  TypeInfoTransforms,
-  visitObjectDefinition,
-  visitQueryDefinition,
-  ImportedQueryDefinition,
   DefinitionKind,
-  PropertyDefinition,
-  populatePropertyType,
-  visitImportedQueryDefinition,
-  visitImportedObjectDefinition,
-  ImportedEnumDefinition,
   EnumDefinition,
+  GenericDefinition,
+  header,
+  ImportedEnumDefinition,
+  ImportedObjectDefinition,
+  ImportedQueryDefinition,
+  isKind,
+  ObjectDefinition,
+  parseSchema,
+  populatePropertyType,
+  PropertyDefinition,
+  QueryDefinition,
+  TypeInfo,
+  TypeInfoTransforms,
   visitEnumDefinition,
   visitImportedEnumDefinition,
-  GenericDefinition,
-  isKind,
-  header,
+  visitImportedObjectDefinition,
+  visitImportedQueryDefinition,
+  visitObjectDefinition,
+  visitQueryDefinition,
 } from "@web3api/schema-parse";
 
 export async function resolveImportsAndParseSchemas(
   schema: string,
   schemaPath: string,
-  mutation: boolean,
+  queryType: QueryType,
   resolvers: SchemaResolvers
 ): Promise<TypeInfo> {
   const importKeywordCapture = /^[#]*["{3}]*import[ \n\t]/gm;
@@ -61,7 +62,7 @@ export async function resolveImportsAndParseSchemas(
 
   const externalImportsToResolve: ExternalImport[] = parseExternalImports(
     externalImportStatements,
-    mutation
+    queryType
   );
 
   const localImportsToResolve: LocalImport[] = parseLocalImports(
@@ -95,7 +96,7 @@ export async function resolveImportsAndParseSchemas(
     .replace(localImportCapture, "");
 
   // Add the @imports directive
-  newSchema = addQueryImportsDirective(newSchema, externalImports, mutation);
+  newSchema = addQueryImportsDirective(newSchema, externalImports, queryType);
 
   // Parse the newly formed schema, and combine it with the subTypeInfo
   return parseSchema(header + newSchema + renderSchema(subTypeInfo, false));
@@ -275,21 +276,18 @@ function appendNamespace(namespace: string, str: string) {
 function addQueryImportsDirective(
   schema: string,
   externalImports: string[],
-  mutation: boolean
+  queryType: QueryType
 ): string {
   if (!externalImports.length) {
     return schema;
   }
 
   // Append the @imports(...) directive to the query type
-  const typeCapture = mutation
-    ? /type[ \n\t]*Mutation[ \n\t]*{/g
-    : /type[ \n\t]*Query[ \n\t]*{/g;
-
+  const typeCapture = new RegExp(`type[ \\n\\t]*${queryType}[ \\n\\t]*{`, "g");
   const importedTypes = `${externalImports
     .map((type) => `\"${type}\"`)
     .join(",\n    ")}`;
-  const replacementQueryStr = `type ${mutation ? "Mutation" : "Query"} @imports(
+  const replacementQueryStr = `type ${queryType} @imports(
   types: [
     ${importedTypes}
   ]
@@ -330,13 +328,14 @@ async function resolveExternalImports(
       let trueTypeKind: DefinitionKind;
 
       // If it's a query type
-      if (importedType === "Query" || importedType === "Mutation") {
+      if (importedType in QueryType) {
         extTypes = extTypeInfo.queryTypes;
         visitorFunc = visitQueryDefinition;
         trueTypeKind = DefinitionKind.ImportedQuery;
       } else if (
-        importedType.endsWith("_Query") ||
-        importedType.endsWith("_Mutation")
+        importedType.endsWith(`_${QueryType.Query}`) ||
+        importedType.endsWith(`_${QueryType.Mutation}`) ||
+        importedType.endsWith(`_${QueryType.Subscription}`)
       ) {
         throw Error(
           `Cannot import an import's imported query type. Tried to import ${importedType} from ${uri}.`
@@ -509,7 +508,7 @@ async function resolveLocalImports(
     const typesToImport: Record<string, GenericDefinition> = {};
 
     for (const importedType of importedTypes) {
-      if (importedType === "Query" || importedType === "Mutation") {
+      if (importedType in QueryType) {
         throw Error(
           `Importing query types from local schemas is prohibited. Tried to import from ${path}.`
         );

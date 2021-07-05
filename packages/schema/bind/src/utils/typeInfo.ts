@@ -5,18 +5,18 @@ import {
   TypeInfoTransforms,
 } from "@web3api/schema-parse";
 
-export function findCommonTypes(a: TypeInfo, b: TypeInfo): string[] {
+export function findCommonTypes(typeInfos: TypeInfo[]): string[] {
   const types: Record<string, boolean> = {};
 
   const addType = (def: GenericDefinition) => {
     types[def.type] = true;
   };
 
-  a.objectTypes.forEach(addType);
-  a.enumTypes.forEach(addType);
-  a.importedEnumTypes.forEach(addType);
-  a.importedObjectTypes.forEach(addType);
-  a.importedQueryTypes.forEach(addType);
+  typeInfos[0].objectTypes.forEach(addType);
+  typeInfos[0].enumTypes.forEach(addType);
+  typeInfos[0].importedEnumTypes.forEach(addType);
+  typeInfos[0].importedObjectTypes.forEach(addType);
+  typeInfos[0].importedQueryTypes.forEach(addType);
 
   const commonTypes: string[] = [];
 
@@ -26,11 +26,13 @@ export function findCommonTypes(a: TypeInfo, b: TypeInfo): string[] {
     }
   };
 
-  b.objectTypes.forEach(tryAddCommonType);
-  b.enumTypes.forEach(tryAddCommonType);
-  b.importedEnumTypes.forEach(tryAddCommonType);
-  b.importedObjectTypes.forEach(tryAddCommonType);
-  b.importedQueryTypes.forEach(tryAddCommonType);
+  for (let i = 1; i < typeInfos.length; i++) {
+    typeInfos[i].objectTypes.forEach(tryAddCommonType);
+    typeInfos[i].enumTypes.forEach(tryAddCommonType);
+    typeInfos[i].importedEnumTypes.forEach(tryAddCommonType);
+    typeInfos[i].importedObjectTypes.forEach(tryAddCommonType);
+    typeInfos[i].importedQueryTypes.forEach(tryAddCommonType);
+  }
 
   return commonTypes;
 }

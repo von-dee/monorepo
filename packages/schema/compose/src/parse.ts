@@ -1,11 +1,11 @@
-import { ExternalImport, LocalImport, SYNTAX_REFERENCE } from "./types";
+import { ExternalImport, LocalImport, QueryType, SYNTAX_REFERENCE } from "./types";
 import { getDuplicates } from "./utils";
 
 import Path from "path";
 
 export function parseExternalImports(
   imports: RegExpMatchArray[],
-  mutation: boolean
+  queryType: QueryType
 ): ExternalImport[] {
   const externalImports: ExternalImport[] = [];
 
@@ -43,9 +43,15 @@ export function parseExternalImports(
     const namespace = importStatement[2];
     const uri = importStatement[3];
 
-    if (!mutation && importedTypes.indexOf("Mutation") > -1) {
+    if (queryType !== QueryType.Mutation && importedTypes.indexOf("Mutation") > -1) {
       throw Error(
-        `Query modules cannot import Mutations, write operations are prohibited.\nSee import statement for namespace "${namespace}" at uri "${uri}"`
+        `Query and subscription modules cannot import Mutations, write operations are prohibited.\nSee import statement for namespace "${namespace}" at uri "${uri}"`
+      );
+    }
+
+    if (queryType !== QueryType.Subscription && importedTypes.indexOf("Subscription") > -1) {
+      throw Error(
+        `Query and mutation modules cannot import Subscriptions.\nSee import statement for namespace "${namespace}" at uri "${uri}"`
       );
     }
 

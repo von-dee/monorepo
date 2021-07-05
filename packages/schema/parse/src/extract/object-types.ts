@@ -29,7 +29,11 @@ const visitorEnter = (
 ) => ({
   ObjectTypeDefinition: (node: ObjectTypeDefinitionNode) => {
     // Skip non-custom types
-    if (node.name.value === "Query" || node.name.value === "Mutation") {
+    if (
+      node.name.value === "Query" ||
+      node.name.value === "Mutation" ||
+      node.name.value === "Subscription"
+    ) {
       return;
     }
 

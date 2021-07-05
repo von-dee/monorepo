@@ -23,56 +23,6 @@ directive @imports(
 ) on OBJECT
 ### Web3API Header END ###
 
-type Query @imports(
-  types: [
-    "Namespace_Query",
-    "Namespace_CustomType",
-    "Namespace_ObjectType",
-    "Namespace_NestedObjectType",
-    "Namespace_Imported_NestedObjectType",
-    "Namespace_Imported_ObjectType",
-    "Namespace_CustomEnum",
-    "Namespace_Imported_Enum"
-  ]
-) {
-  method1(
-    str: String!
-    optStr: String
-    u: UInt!
-    uArrayArray: [[UInt]]!
-  ): String!
-
-  method2(
-    arg: [String!]!
-  ): [Int64!]!
-}
-
-type Mutation @imports(
-  types: [
-    "Namespace_Query",
-    "Namespace_Mutation",
-    "Namespace_NestedObjectType",
-    "Namespace_ObjectType",
-    "Namespace_Imported_NestedObjectType",
-    "Namespace_Imported_ObjectType",
-    "Namespace_CustomType",
-    "Namespace_CustomEnum",
-    "Namespace_Imported_Enum",
-    "JustMutation_Mutation"
-  ]
-) {
-  method1(
-    str: String!
-    optStr: String
-    u: UInt!
-    uArrayArray: [[UInt]]!
-  ): String!
-
-  method2(
-    arg: [String!]!
-  ): [Int64!]!
-}
-
 type Subscription @imports(
   types: [
     "Namespace_Query",
@@ -98,66 +48,6 @@ type Subscription @imports(
   ): [Int64!]!
 }
 
-type CustomQueryType {
-  str: String!
-  optStr: String
-  u: UInt!
-  optU: UInt
-  u8: UInt8!
-  u64: UInt64!
-  i: Int!
-  i8: Int8!
-  i64: Int64!
-  bytes: Bytes!
-  uArray: [UInt!]!
-  uOptArray: [UInt!]
-  optStrOptArray: [String]
-  crazyArray: [[[[UInt64!]]!]]
-  commonType: CommonType!
-  customType: Namespace_CustomType!
-}
-
-type AnotherQueryType {
-  prop: String
-}
-
-type CommonType {
-  prop: UInt8!
-  nestedObject: NestedType!
-  objectArray: [[ArrayObject]]!
-}
-
-type NestedType {
-  prop: String!
-}
-
-type ArrayObject {
-  prop: String!
-}
-
-type CustomMutationType {
-  str: String!
-  optStr: String
-  u: UInt!
-  optU: UInt
-  u8: UInt8!
-  u64: UInt64!
-  i: Int!
-  i8: Int8!
-  i64: Int64!
-  bytes: Bytes!
-  uArray: [UInt!]!
-  uOptArray: [UInt!]
-  optStrOptArray: [String]
-  crazyArray: [[[[UInt64!]]!]]
-  commonType: CommonType!
-  customType: Namespace_CustomType!
-}
-
-type AnotherMutationType {
-  prop: String
-}
-
 type CustomSubscriptionType {
   str: String!
   optStr: String
@@ -181,6 +71,20 @@ type AnotherSubscriptionType {
   prop: String
 }
 
+type CommonType {
+  prop: UInt8!
+  nestedObject: NestedType!
+  objectArray: [[ArrayObject]]!
+}
+
+type NestedType {
+  prop: String!
+}
+
+type ArrayObject {
+  prop: String!
+}
+
 ### Imported Queries START ###
 
 type Namespace_Query @imported(
@@ -197,44 +101,6 @@ type Namespace_Query @imported(
   ): String!
 
   method2(
-    arg: [String!]!
-  ): [Int64!]!
-}
-
-type Namespace_Mutation @imported(
-  uri: "test.eth",
-  namespace: "Namespace",
-  nativeType: "Mutation"
-) {
-  method1(
-    str: String!
-    optStr: String
-    u: UInt!
-    optU: UInt
-    uArrayArray: [[UInt]]!
-  ): String!
-
-  method2(
-    arg: [String!]!
-  ): [Int64!]!
-
-  localObjects(
-    nestedLocalObject: Namespace_NestedObjectType
-    localObjectArray: [Namespace_NestedObjectType!]
-  ): Namespace_NestedObjectType
-
-  importedObjects(
-    nestedLocalObject: Namespace_Imported_NestedObjectType
-    localObjectArray: [Namespace_Imported_NestedObjectType!]
-  ): Namespace_Imported_NestedObjectType
-}
-
-type JustMutation_Mutation @imported(
-  uri: "just.mutation.eth",
-  namespace: "JustMutation",
-  nativeType: "Mutation"
-) {
-  method(
     arg: [String!]!
   ): [Int64!]!
 }

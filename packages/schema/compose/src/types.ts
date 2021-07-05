@@ -21,6 +21,12 @@ export interface LocalImport {
   path: string;
 }
 
+export enum QueryType {
+  Mutation = "Mutation",
+  Query = "Query",
+  Subscription = "Subscription",
+}
+
 export const SYNTAX_REFERENCE =
   `External Import: import { Type, Query } into Namespace from "external.uri"\n` +
   `Local Import: import { Type } from "./local/path/file.graphql"`;

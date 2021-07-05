@@ -49,6 +49,14 @@ type Mutation {
   ): String!
 }
 
+type Subscription {
+  method1(
+    arg1: String!
+    arg2: String
+    arg3: Boolean
+  ): String!
+}
+
 type TestImport_Query @imported(
   uri: "testimport.uri.eth",
   namespace: "TestImport",
@@ -221,6 +229,51 @@ describe("Web3API Schema TypeInfo Transformations", () => {
             {
               ...createMethodDefinition({
                 type: "mutation",
+                name: "method1",
+                arguments: [
+                  {
+                    ...createScalarPropertyDefinition({
+                      type: "String",
+                      name: "arg1",
+                      required: true,
+                    }),
+                    first: true,
+                    last: null
+                  } as PropertyDefinition,
+                  createScalarPropertyDefinition({
+                    type: "String",
+                    name: "arg2",
+                    required: false,
+                  }),
+                  {
+                    ...createScalarPropertyDefinition({
+                      type: "Boolean",
+                      name: "arg3",
+                      required: false,
+                    }),
+                    first: null,
+                    last: true
+                  } as PropertyDefinition,
+                ],
+                return: createScalarPropertyDefinition({
+                  type: "String",
+                  name: "method1",
+                  required: true
+                })
+              }),
+              first: true,
+              last: true
+            } as MethodDefinition,
+          ],
+          first: null,
+          last: null,
+        } as QueryDefinition,
+        {
+          ...createQueryDefinition({ type: "Subscription" }),
+          methods: [
+            {
+              ...createMethodDefinition({
+                type: "subscription",
                 name: "method1",
                 arguments: [
                   {

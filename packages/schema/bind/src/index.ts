@@ -35,6 +35,7 @@ export interface OutputDirectory {
 export interface BindOutput {
   query?: OutputDirectory;
   mutation?: OutputDirectory;
+  subscription?: OutputDirectory;
 }
 
 export interface BindModuleOptions {
@@ -46,35 +47,42 @@ export interface BindOptions {
   language: TargetLanguage;
   query?: BindModuleOptions;
   mutation?: BindModuleOptions;
+  subscription?: BindModuleOptions;
 }
 
 export function bindSchema(options: BindOptions): BindOutput {
-  const { query, mutation, language } = options;
+  const { query, mutation, subscription, language } = options;
 
-  // If both Query & Mutation modules are present,
+  // If at least two modules are present,
   // determine which types are shared between them,
   // and add the __common & __commonPath properties
-  if (query && mutation) {
+  const modules = [query, mutation, subscription].filter(
+    (v): v is BindModuleOptions => v !== undefined
+  );
+  if (modules.length > 1) {
     // Find all common types
-    const commonTypes = findCommonTypes(query.typeInfo, mutation.typeInfo);
+    const commonTypes = findCommonTypes(modules.map((m) => m.typeInfo));
 
     if (commonTypes.length) {
-      query.typeInfo = transformTypeInfo(
-        query.typeInfo,
+      modules[0].typeInfo = transformTypeInfo(
+        modules[0].typeInfo,
         extendCommonTypes(commonTypes)
       );
 
       // Compute the __commonPath
       const commonPath =
-        getRelativePath(mutation.outputDirAbs, query.outputDirAbs) + "/common";
+        getRelativePath(modules[1].outputDirAbs, modules[0].outputDirAbs) +
+        "/common";
 
-      mutation.typeInfo = {
-        ...transformTypeInfo(
-          mutation.typeInfo,
-          extendCommonTypes(commonTypes, commonPath)
-        ),
-        __commonPath: commonPath,
-      } as TypeInfo;
+      for (let i = 1; i < modules.length; i++) {
+        modules[i].typeInfo = {
+          ...transformTypeInfo(
+            modules[i].typeInfo,
+            extendCommonTypes(commonTypes, commonPath)
+          ),
+          __commonPath: commonPath,
+        } as TypeInfo;
+      }
     }
   }
 
@@ -82,6 +90,9 @@ export function bindSchema(options: BindOptions): BindOutput {
     query: query ? generateBinding(language, query.typeInfo) : undefined,
     mutation: mutation
       ? generateBinding(language, mutation.typeInfo)
+      : undefined,
+    subscription: subscription
+      ? generateBinding(language, subscription.typeInfo)
       : undefined,
   };
 }

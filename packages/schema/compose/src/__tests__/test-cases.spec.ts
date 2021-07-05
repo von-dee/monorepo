@@ -41,6 +41,9 @@ describe("Web3API Schema Composer Test Cases", () => {
       if (testCase.output.mutation) {
         expect(result.mutation).toEqual(testCase.output.mutation);
       }
+      if (testCase.output.subscription) {
+        expect(result.subscription).toEqual(testCase.output.subscription);
+      }
       if (testCase.output.combined) {
         expect(result.combined).toEqual(testCase.output.combined);
       }

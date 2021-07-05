@@ -79,12 +79,15 @@ export function fetchTestCases(): TestCases {
     // Fetch the input schemas
     const queryInput = fetchIfExists("input/query.graphql");
     const mutationInput = fetchIfExists("input/mutation.graphql");
+    const subscriptionInput = fetchIfExists("input/subscription.graphql");
 
     // Fetch the output schemas
     const querySchema = fetchIfExists("output/query.graphql");
     const queryTypeInfo = await importIfExists("output/query.ts");
     const mutationSchema = fetchIfExists("output/mutation.graphql");
     const mutationTypeInfo = await importIfExists("output/mutation.ts");
+    const subscriptionSchema = fetchIfExists("output/subscription.graphql");
+    const subscriptionTypeInfo = await importIfExists("output/subscription.ts");
     const schemaSchema = fetchIfExists("output/schema.graphql");
     const schemaTypeInfo = await importIfExists("output/schema.ts");
 
@@ -120,6 +123,16 @@ export function fetchTestCases(): TestCases {
                 ),
               }
             : undefined,
+          subscription: subscriptionInput
+            ? {
+              schema: subscriptionInput,
+              absolutePath: path.join(
+                root,
+                dirent.name,
+                "input/subscription.graphql"
+              ),
+            }
+            : undefined,
         },
         resolvers: {
           external: resolveExternal,
@@ -136,10 +149,14 @@ export function fetchTestCases(): TestCases {
           schema: mutationSchema,
           typeInfo: mutationTypeInfo
         } : undefined,
+        subscription: subscriptionSchema && subscriptionTypeInfo ? {
+          schema: subscriptionSchema,
+          typeInfo: subscriptionTypeInfo
+        } : undefined,
         combined: schemaSchema && schemaTypeInfo ? {
           schema: schemaSchema,
           typeInfo: schemaTypeInfo
-        } : undefined
+        } : {}
       },
     };
   };

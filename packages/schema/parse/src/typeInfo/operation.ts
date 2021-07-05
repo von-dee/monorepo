@@ -1,6 +1,7 @@
 const operationTypes = {
   mutation: "mutation",
   query: "query",
+  subscription: "subscription",
 };
 
 export type OperationTypes = typeof operationTypes;

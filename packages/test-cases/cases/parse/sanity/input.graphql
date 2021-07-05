@@ -125,6 +125,16 @@ type TestImport_Mutation @imported(
   ): String!
 }
 
+type TestImport_Subscription @imported(
+  uri: "testimport.uri.eth",
+  namespace: "TestImport",
+  nativeType: "Subscription"
+) {
+  importedMethod(
+    str: String!
+  ): String!
+}
+
 type TestImport_Object @imported(
   uri: "testimport.uri.eth",
   namespace: "TestImport",

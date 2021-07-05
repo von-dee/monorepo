@@ -40,7 +40,7 @@ export function importsDirective(astNode: DocumentNode): void {
     lastNodeVisited = node.kind;
     const badUsageLocations: string[] = [];
 
-    const importsAllowedObjectTypes = ["Query", "Mutation"];
+    const importsAllowedObjectTypes = ["Query", "Mutation", "Subscription"];
     const directives =
       node.directives &&
       node.directives.map((directive) => directive.name.value);

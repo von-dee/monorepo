@@ -1,12 +1,6 @@
 import { parseSchema } from "..";
 import { typeValidators } from "../validate";
 
-const typeDefinitions1 = `
-type Subscription {
-  prop: String!
-}
-`;
-
 const typeDefinitions2 = `
 input Custom {
   prop: String!
@@ -223,10 +217,6 @@ describe("Web3API Schema Type Validation", () => {
       validators: [typeValidators.typeDefinitions]
     });
 
-    expect(exec(typeDefinitions1)).toThrow(
-      /Subscriptions are not yet supported./gm
-    );
-
     expect(exec(typeDefinitions2)).toThrow(
       /Input type definitions are not supported.\nFound: input Custom {/gm
     );
@@ -274,7 +264,7 @@ describe("Web3API Schema Type Validation", () => {
     );
 
     expect(exec(propertyTypes7)).toThrow(
-      /Methods can only be defined on query types \(Mutation, Query\)\.\nFound: type Queryy { method\(prop\) }/gm
+      /Methods can only be defined on query types \(Mutation, Query, Subscription\)\.\nFound: type Queryy { method\(prop\) }/gm
     );
   })
 

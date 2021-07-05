@@ -451,5 +451,27 @@ export const output: TypeInfo = {
         },
       ],
     },
+    {
+      ...createImportedQueryDefinition({
+        uri: "testimport.uri.eth",
+        namespace: "TestImport",
+        type: "TestImport_Subscription",
+        nativeType: "Subscription"
+      }),
+      methods: [
+        {
+          ...createMethodDefinition({
+            type: "subscription",
+            name: "importedMethod",
+            return: createScalarPropertyDefinition({
+              name: "importedMethod",
+              type: "String",
+              required: true
+            }),
+          }),
+          arguments: [createScalarPropertyDefinition({ name: "str", type: "String", required: true })],
+        },
+      ],
+    },
   ],
 };

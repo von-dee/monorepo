@@ -1,6 +1,7 @@
 const queryTypes = {
   Mutation: "Mutation",
   Query: "Query",
+  Subscription: "Subscription",
 };
 
 export type QueryTypes = typeof queryTypes;

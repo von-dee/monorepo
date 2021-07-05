@@ -30,13 +30,6 @@ export function typeDefinitions(astNode: DocumentNode): void {
         );
       },
       ObjectTypeDefinition: (node) => {
-        // No Subscriptions
-        if (node.name.value === "Subscription") {
-          throw Error(
-            "Subscriptions are not yet supported. Please use Query or Mutation."
-          );
-        }
-
         // No duplicates
         if (objectTypes[node.name.value]) {
           throw Error(

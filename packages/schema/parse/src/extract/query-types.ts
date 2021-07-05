@@ -35,7 +35,11 @@ const visitorEnter = (
   ObjectTypeDefinition: (node: ObjectTypeDefinitionNode) => {
     const nodeName = node.name.value;
 
-    if (nodeName !== "Query" && nodeName !== "Mutation") {
+    if (
+      nodeName !== "Query" &&
+      nodeName !== "Mutation" &&
+      nodeName !== "Subscription"
+    ) {
       return;
     }
 

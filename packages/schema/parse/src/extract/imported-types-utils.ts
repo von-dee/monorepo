@@ -25,15 +25,25 @@ export function extractImportedDefinition(
   const queryTest = typeName.substr(-queryIdentifier.length);
   const mutationIdentifier = "_Mutation";
   const mutationTest = typeName.substr(-mutationIdentifier.length);
+  const subscriptionIdentifier = "_Subscription";
+  const subscriptionTest = typeName.substr(-subscriptionIdentifier.length);
 
   if (queryTypes) {
     // Ignore everything that isn't a query type
-    if (queryTest !== queryIdentifier && mutationTest !== mutationIdentifier) {
+    if (
+      queryTest !== queryIdentifier &&
+      mutationTest !== mutationIdentifier &&
+      subscriptionTest !== subscriptionIdentifier
+    ) {
       return undefined;
     }
   } else {
     // Ignore query types
-    if (queryTest === queryIdentifier || mutationTest === mutationIdentifier) {
+    if (
+      queryTest === queryIdentifier ||
+      mutationTest === mutationIdentifier ||
+      subscriptionTest === subscriptionIdentifier
+    ) {
       return undefined;
     }
   }
