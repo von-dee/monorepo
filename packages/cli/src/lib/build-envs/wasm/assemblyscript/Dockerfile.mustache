@@ -14,6 +14,9 @@ WORKDIR /project
 COPY package.json .
 RUN yarn
 
+# Install binaryen
+RUN yarn add binaryen
+
 # Copy all manifest files
 {{#web3api_manifests}}
 COPY {{.}} .

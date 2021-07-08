@@ -31,6 +31,7 @@ export interface State {
     result?: ArrayBuffer;
     error?: string;
   };
+  asyncifyAwait?: Promise<void>;
   invokeResult: InvokeResult;
 }
 
@@ -156,11 +157,31 @@ export class WasmWeb3Api extends Api {
 
         exports.values._w3_init();
 
-        console.log("STARTING", "_w3_invoke", state.method.length, state.args.byteLength)
-        const result = exports.values._w3_invoke(
-          state.method.length,
-          state.args.byteLength
-        );
+        let invokeComplete = false;
+        let result: boolean | undefined = undefined;
+        while (!invokeComplete) {
+          console.log("STARTING", "_w3_invoke", state.method.length, state.args.byteLength)
+          console.log(memory.buffer);
+          result = exports.values._w3_invoke(
+            state.method.length,
+            state.args.byteLength
+          );
+
+          if (state.asyncifyAwait) {
+            console.log("stop_unwind");
+            exports.values.asyncify_stop_unwind();
+            console.log("awaiting...")
+            await state.asyncifyAwait;
+          } else {
+            invokeComplete = true;
+          }
+        }
+
+        console.log("doesn't show?")
+
+        if (!result) {
+          throw Error("_w3_invoke result is undefined, this should never happen.");
+        }
 
         const invokeResult = processInvokeResult(state, result);
 

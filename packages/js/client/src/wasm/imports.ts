@@ -64,15 +64,12 @@ export const createImports = (config: {
 
           return !error;
         },
-        () => {
-          return {
-            method:  "_w3_invoke",
-            args: [state.method.length, state.args.byteLength]
-          }
-        },
         {
           memory,
           exports,
+          setAsync: (asyncifyAwait: Promise<void>) => {
+            state.asyncifyAwait = asyncifyAwait;
+          }
         }
       ),
       __w3_log: (msgPtr: u32, msgLen: u32) => {
