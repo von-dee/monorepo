@@ -165,22 +165,18 @@ export class WasmWeb3Api extends Api {
         let result: boolean | undefined = undefined;
 
         while (!invokeComplete) {
-          console.log("_w3_invoke")
-          console.log(memory.buffer)
+          let resolve: (() => void) | undefined;
+          state.locks.main = new Promise((res, rej) => {
+            resolve = res;
+          });
+
           result = exports.values._w3_invoke(
             state.method.length,
             state.args.byteLength
           );
 
           if (state.locks.wasm) {
-            let resolve: (() => void) | undefined;
-            state.locks.main = new Promise((res, rej) => {
-              resolve = res;
-            });
-            console.log("asyncify_stop_unwind")
             exports.values.asyncify_stop_unwind();
-            console.log(memory.buffer)
-
             if (!resolve) {
               throw Error("WasmWeb3Api main lock resolve is undefined, this should never happen.");
             }
@@ -188,6 +184,10 @@ export class WasmWeb3Api extends Api {
             await state.locks.wasm;
           } else {
             invokeComplete = true;
+            if (!resolve) {
+              throw Error("WasmWeb3Api main lock resolve is undefined, this should never happen.");
+            }
+            resolve();
           }
         }
 

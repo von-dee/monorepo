@@ -17,7 +17,6 @@ export class WasmPromise<T> {
 
     return (...args: unknown[]) => {
       if (sleeping) {
-        console.log("asyncify_stop_rewind")
         context.exports.values.asyncify_stop_rewind();
         sleeping = false;
         context.setLock(undefined);
@@ -31,34 +30,32 @@ export class WasmPromise<T> {
           reject = rej;
         }));
 
-        view[dataAddr >> 2] = dataAddr + 8;
-        view[(dataAddr + 4) >> 2] = 100 * 1024;
-        console.log("asyncify_start_unwind")
+        view[dataAddr] = dataAddr + 8;
+        view[(dataAddr + 4)] = dataAddr + (100 * 1024);
         context.exports.values.asyncify_start_unwind(dataAddr);
         sleeping = true;
 
-        console.log("exec")
-        func(...args).then(async (res: T) => {
-          const lock = context.getLock();
-          if (lock) {
-            console.log("awaiting unwind");
-            await lock;
-          }
+        const lock = context.getLock();
+        if (!lock) {
+          throw Error("lock is undefined...")
+        }
 
-          console.log("asyncify_start_rewind")
-          console.log(context.memory.buffer)
-          context.exports.values.asyncify_start_rewind(dataAddr);
-          result = res;
-
-          if (!resolve) {
-            throw Error("WasmPromise resolve undefined, this should never happen.");
-          }
-          resolve();
-        }).catch((e) => {
-          if (!reject) {
-            throw Error("WasmPromise reject undefined, this should never happen.");
-          }
-          reject(e);
+        // lock await
+        lock.then(() => {
+          func(...args).then(async (res: T) => {
+            context.exports.values.asyncify_start_rewind(dataAddr);
+            result = res;
+  
+            if (!resolve) {
+              throw Error("WasmPromise resolve undefined, this should never happen.");
+            }
+            resolve();
+          }).catch((e) => {
+            if (!reject) {
+              throw Error("WasmPromise reject undefined, this should never happen.");
+            }
+            reject(e);
+          });
         });
       }
 
