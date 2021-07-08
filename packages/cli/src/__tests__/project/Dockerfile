@@ -34,7 +34,8 @@ RUN ./node_modules/.bin/asc src/mutation/w3/entry.ts \
 RUN ./node_modules/binaryen/bin/wasm-opt ./build/pre-mutation.wasm \
     -O2 \
     -all \
-    --pass-arg=asyncify-imports@w3.__w3_invoke_args,w3.__w3_invoke_result,w3.__w3_invoke_error,w3.__w3_abort,w3.__w3_log,w3.__w3_subinvoke_result_len,w3.__w3_subinvoke_error_len,w3.__w3_subinvoke_error,w3.__w3_subinvoke_result,w3.__w3_subinvoke \
+    --pass-arg=asyncify-imports@w3.__w3_subinvoke \
+    --pass-arg=asyncify-removelist@serialize*,deserialize* \
     --output=./build/mutation.wasm
 
 # Build the module at src/query
@@ -49,5 +50,6 @@ RUN ./node_modules/.bin/asc src/query/w3/entry.ts \
 RUN ./node_modules/binaryen/bin/wasm-opt ./build/pre-query.wasm \
     -O2 \
     -all \
-    --pass-arg=asyncify-imports@w3.__w3_invoke_args,w3.__w3_invoke_result,w3.__w3_invoke_error,w3.__w3_abort,w3.__w3_log,w3.__w3_subinvoke_result_len,w3.__w3_subinvoke_error_len,w3.__w3_subinvoke_error,w3.__w3_subinvoke_result,w3.__w3_subinvoke \
+    --pass-arg=asyncify-imports@w3.__w3_subinvoke \
+    --pass-arg=asyncify-removelist@serialize*,deserialize* \
     --output=./build/query.wasm
