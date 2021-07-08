@@ -67,8 +67,11 @@ export const createImports = (config: {
         {
           memory,
           exports,
-          setAsync: (asyncifyAwait: Promise<void>) => {
-            state.asyncifyAwait = asyncifyAwait;
+          setLock: (lock?: Promise<void>) => {
+            state.locks.wasm = lock;
+          },
+          getLock: () => {
+            return state.locks.main;
           }
         }
       ),

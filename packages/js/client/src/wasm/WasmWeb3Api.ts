@@ -31,7 +31,10 @@ export interface State {
     result?: ArrayBuffer;
     error?: string;
   };
-  asyncifyAwait?: Promise<void>;
+  locks: {
+    wasm?: Promise<void>;
+    main?: Promise<void>;
+  }
   invokeResult: InvokeResult;
 }
 
@@ -104,6 +107,7 @@ export class WasmWeb3Api extends Api {
           invoke: {},
           subinvoke: {},
           invokeResult: {} as InvokeResult,
+          locks: {},
           method,
           args:
             input instanceof ArrayBuffer
@@ -159,25 +163,33 @@ export class WasmWeb3Api extends Api {
 
         let invokeComplete = false;
         let result: boolean | undefined = undefined;
+
         while (!invokeComplete) {
-          console.log("STARTING", "_w3_invoke", state.method.length, state.args.byteLength)
-          console.log(memory.buffer);
+          console.log("_w3_invoke")
+          console.log(memory.buffer)
           result = exports.values._w3_invoke(
             state.method.length,
             state.args.byteLength
           );
 
-          if (state.asyncifyAwait) {
-            console.log("stop_unwind");
+          if (state.locks.wasm) {
+            let resolve: (() => void) | undefined;
+            state.locks.main = new Promise((res, rej) => {
+              resolve = res;
+            });
+            console.log("asyncify_stop_unwind")
             exports.values.asyncify_stop_unwind();
-            console.log("awaiting...")
-            await state.asyncifyAwait;
+            console.log(memory.buffer)
+
+            if (!resolve) {
+              throw Error("WasmWeb3Api main lock resolve is undefined, this should never happen.");
+            }
+            resolve();
+            await state.locks.wasm;
           } else {
             invokeComplete = true;
           }
         }
-
-        console.log("doesn't show?")
 
         if (!result) {
           throw Error("_w3_invoke result is undefined, this should never happen.");
