@@ -1,0 +1,5 @@
+mutation {
+  approve(token: $token, amount: $amount, txOverrides: $txOverrides) {
+    txReceipt
+  }
+}

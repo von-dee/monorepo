@@ -1,0 +1,22 @@
+name: Uniswap V2 in ultra BETA
+subtext: Wrapper in beta for Uniswap!
+description: First DEX in Ethereum blockchain
+icon: ./meta/imgs/dark_icon.svg
+links:
+  - name: GitHub
+    icon: ./meta/imgs/github.svg
+    url: https://github.com/polywrap/monorepo/tree/prealpha/packages/apis/uniswapv2
+  - name: Website
+    icon: ./meta/imgs/favicon.png
+    url: https://app.uniswap.org
+queries:
+  - name: Swap Token
+    description: Swap any ERC20 token
+    query: ./meta/queries/swap.graphql
+    recipe: ./meta/recipes/swap.json
+  - name: Approve Token
+    description: Approve uniswap contract to swap token
+    query: ./meta/queries/approve.graphql
+  - name: Exec call
+    description: Execute swap transaction with encoded data
+    query: ./meta/queries/execCall.graphql

@@ -1,0 +1,12 @@
+mutation {
+  swap(
+    tokenIn: $tokenIn
+    tokenOut: $tokenOut
+    amount: $amount
+    tradeType: $tradeType,
+    tradeOptions: $tradeOptions,
+    txOverrides: $txOverrides
+  ) {
+    txReceipt
+  }
+}

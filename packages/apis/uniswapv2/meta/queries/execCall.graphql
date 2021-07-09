@@ -1,0 +1,9 @@
+mutation {
+  execCall(
+    parameters: $parameters
+    chainId: $chainId
+    txOverrides: $txOverrides
+  ) {
+    txRec
+  }
+}

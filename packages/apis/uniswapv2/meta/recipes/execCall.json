@@ -1,0 +1,16 @@
+{
+  "parameters": {
+      "methodName": "swapExactETHForTokens",
+      "args": [
+          "0x498af2af10840e45",
+          "[\"0xc778417E063141139Fce010982780140Aa0cD5Ab\",\"0xaD6D458402F60fD3Bd25163575031ACDce07538D\"]",
+          "0x61FfE691821291D02E9Ba5D33098ADcee71a3a17",
+          "0x60e5b26d"
+      ],
+      "value": "0x2386f26fc10000"
+  },
+  "chainId": "ROPSTEN",
+  "txOverrides": {
+      "gasLimit": "159043"
+  }
+}
