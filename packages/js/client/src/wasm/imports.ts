@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { u32, W3Exports, W3Imports } from "./types";
-import { WasmPromise } from "./WasmPromise";
 import { readBytes, readString, writeBytes, writeString } from "./utils";
 import { Client, InvokableModules } from "..";
 import { State } from "./WasmWeb3Api";
+import { NewWasmPromise } from "./NewWasmPromise";
 
 import * as MsgPack from "@msgpack/msgpack";
 
@@ -14,11 +15,11 @@ export const createImports = (config: {
   memory: WebAssembly.Memory;
   state: State;
 }): W3Imports => {
-  const { memory, client, exports, state } = config;
+  const { memory, client, state } = config;
 
   return {
     w3: {
-      __w3_subinvoke: WasmPromise.create(
+      __w3_subinvoke: NewWasmPromise.create(
         async (
           uriPtr: u32,
           uriLen: u32,
@@ -64,16 +65,7 @@ export const createImports = (config: {
 
           return !error;
         },
-        () => {
-          return {
-            method:  "_w3_invoke",
-            args: [state.method.length, state.args.byteLength]
-          }
-        },
-        {
-          memory,
-          exports,
-        }
+        config
       ),
       __w3_log: (msgPtr: u32, msgLen: u32) => {
         console.log("__w3_log:", readString(memory.buffer, msgPtr, msgLen));

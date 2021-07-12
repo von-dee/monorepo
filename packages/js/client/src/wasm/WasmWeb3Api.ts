@@ -132,7 +132,7 @@ export class WasmWeb3Api extends Api {
           "asyncify_start_unwind",
           "asyncify_stop_unwind",
           "asyncify_start_rewind",
-          "asyncify_stop_rewind"
+          "asyncify_stop_rewind",
         ];
         const missingExports = requiredExports.filter(
           (name) => !exportKeys.includes(name)
@@ -156,7 +156,12 @@ export class WasmWeb3Api extends Api {
 
         exports.values._w3_init();
 
-        console.log("STARTING", "_w3_invoke", state.method.length, state.args.byteLength)
+        console.log(
+          "STARTING",
+          "_w3_invoke",
+          state.method.length,
+          state.args.byteLength
+        );
         const result = exports.values._w3_invoke(
           state.method.length,
           state.args.byteLength
@@ -190,7 +195,9 @@ export class WasmWeb3Api extends Api {
             if (decode) {
               try {
                 return {
-                  data: MsgPack.decode(invokeResult.invokeResult as ArrayBuffer),
+                  data: MsgPack.decode(
+                    invokeResult.invokeResult as ArrayBuffer
+                  ),
                 };
               } catch (err) {
                 throw Error(

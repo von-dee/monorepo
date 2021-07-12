@@ -10,7 +10,7 @@ export class WasmPromise<T> {
 
   static create<T>(
     func: (...args: unknown[]) => Promise<T>,
-    getRootCall: () => { method: string, args: unknown[] },
+    getRootCall: () => { method: string; args: unknown[] },
     config: {
       memory: WebAssembly.Memory;
       exports: { values: W3Exports };
@@ -23,7 +23,7 @@ export class WasmPromise<T> {
     return (...args: unknown[]) => {
       instance._dataAddr = instance._exports.values._w3_asyncify_storage();
       instance.execAsyncFunc(() => {
-        console.log("executing")
+        console.log("executing");
         func(...args).then((result: T) => {
           const rootCall = getRootCall();
           instance.resumeState(rootCall.method, rootCall.args)(result);
@@ -36,7 +36,10 @@ export class WasmPromise<T> {
     };
   }
 
-  private resumeState(rootMethod: string, rootArgs: unknown[]): (resolvedData: T) => void {
+  private resumeState(
+    rootMethod: string,
+    rootArgs: unknown[]
+  ): (resolvedData: T) => void {
     return (resolvedData: T) => {
       console.log("start_rewind");
       this._exports.values.asyncify_start_rewind(this._dataAddr);
@@ -53,12 +56,12 @@ export class WasmPromise<T> {
       this._view[this._dataAddr >> 2] = this._dataAddr + 8;
       this._view[(this._dataAddr + 4) >> 2] = 8 * 1024;
 
-      console.log("start_unwind")
+      console.log("start_unwind");
       this._exports.values.asyncify_start_unwind(this._dataAddr);
       this._sleeping = true;
       exec();
     } else {
-      console.log("stop_rewind")
+      console.log("stop_rewind");
       this._exports.values.asyncify_stop_rewind();
       this._sleeping = false;
     }
