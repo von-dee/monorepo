@@ -22,6 +22,20 @@ export declare function __w3_subinvoke_error_len(): u32;
 @external("w3", "__w3_subinvoke_error")
 export declare function __w3_subinvoke_error(ptr: u32): void;
 
+export function _w3_subinvoke(
+  uri_ptr: u32, uri_len: u32,
+  module_ptr: u32, module_len: u32,
+  method_ptr: u32, method_len: u32,
+  input_ptr: u32, input_len: u32
+): bool {
+  return __w3_subinvoke(
+    uri_ptr, uri_len,
+    module_ptr, module_len,
+    method_ptr, method_len,
+    input_ptr, input_len
+  );
+}
+
 // Subinvoke API Helper
 export function w3_subinvoke(
   uri: string,
@@ -32,7 +46,7 @@ export function w3_subinvoke(
   const uriBuf = String.UTF8.encode(uri);
   const moduleBuf = String.UTF8.encode(module);
   const methodBuf = String.UTF8.encode(method);
-  const success = __w3_subinvoke(
+  const success = _w3_subinvoke(
     changetype<u32>(uriBuf), uriBuf.byteLength,
     changetype<u32>(moduleBuf), moduleBuf.byteLength,
     changetype<u32>(methodBuf), methodBuf.byteLength,

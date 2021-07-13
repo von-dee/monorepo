@@ -14,6 +14,8 @@ import {
 {{/methods.length}}
 {{/queryTypes}}
 
+export _w3_subinvoke from "@namestys/wasm-as";
+
 export function _w3_init(): void {
   {{#queryTypes}}
   {{#methods}}
