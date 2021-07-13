@@ -44,7 +44,7 @@ describe("Web3ApiClient", () => {
     })
   }
 
-  it.only("simple-storage", async () => {
+  it.skip("simple-storage", async () => {
     const api = await buildAndDeployApi(
       `${GetPathToTestApis()}/simple-storage`,
       ipfsProvider,
@@ -141,7 +141,7 @@ describe("Web3ApiClient", () => {
     expect(get.data?.thirdGetData).toBe(55);*/
   });
 
-  it.skip("object-types", async () => {
+  it.only("object-types", async () => {
     const api = await buildAndDeployApi(
       `${GetPathToTestApis()}/object-types`,
       ipfsProvider,

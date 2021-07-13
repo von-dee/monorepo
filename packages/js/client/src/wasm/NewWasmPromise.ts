@@ -40,7 +40,7 @@ export class NewWasmPromise {
 
     return (...args: any[]) => {
       console.log(config.exports.values);
-      this.view = new Int32Array(config.memory as any);
+      this.view = new Int32Array(config.exports.values.memory.buffer as any);
       console.log("CALL MAIN 1");
       console.log("BEFORE MAIN: ", config.exports.values.asyncify_get_state());
       wrapperFunc(...args);
