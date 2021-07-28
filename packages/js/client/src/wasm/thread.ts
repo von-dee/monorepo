@@ -261,17 +261,6 @@ addEventListener(
     // Store transfer buffer
     state.transfer = new Uint8Array(data.transferBuffer, 0, maxTransferBytes);
 
-    // Store the method we're invoking
-    state.method = data.method;
-
-    if (data.input instanceof ArrayBuffer) {
-      // No need to serialize
-      state.args = data.input;
-    } else {
-      // We must serialize the input object into msgpack
-      state.args = MsgPack.encode(data.input, { ignoreUndefined: true });
-    }
-
     const module = new WebAssembly.Module(data.wasm);
     const memory = new WebAssembly.Memory({ initial: 1 });
     const source = new WebAssembly.Instance(module, imports(memory));
@@ -309,12 +298,37 @@ addEventListener(
       if (input.data.sanitizedEnvironment) {
         state.environment = input.data.sanitizedEnvironment;
       } else {
-        state.environment = MsgPack.encode(input.data.clientEnvironment, {
-          ignoreUndefined: true,
-        });
+        if (hasExport("_w3_sanitize_env", exports)) {
+          state.args = MsgPack.encode(
+            {
+              env: input.data.clientEnvironment,
+            },
+            {
+              ignoreUndefined: true,
+            }
+          );
+          state.method = "sanitizeQueryEnv";
+          exports._w3_sanitize_env(state.method.length, state.args.byteLength);
+          state.environment = state.invoke.result as ArrayBuffer;
+        } else {
+          state.environment = MsgPack.encode(input.data.clientEnvironment, {
+            ignoreUndefined: true,
+          });
+        }
       }
 
       exports._w3_load_env(state.environment.byteLength);
+    }
+
+    // Store the method we're invoking
+    state.method = data.method;
+
+    if (data.input instanceof ArrayBuffer) {
+      // No need to serialize
+      state.args = data.input;
+    } else {
+      // We must serialize the input object into msgpack
+      state.args = MsgPack.encode(data.input, { ignoreUndefined: true });
     }
 
     const result = exports._w3_invoke(
