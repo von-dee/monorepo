@@ -330,7 +330,7 @@ addEventListener(
           });
         }
 
-        // dispatch sanitized enviroment to WasmWeb3Api
+        // dispatch sanitized environment to WasmWeb3Api
         dispatchAction({
           type: "LogSanitizedEnv",
           module: input.data.module,
