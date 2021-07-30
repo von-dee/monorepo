@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/ban-types */
 
+import { InvokableModules } from "@web3api/core-js";
+
 export const maxTransferBytes = 256; // do not change
 export const maxThreads = 128;
 
@@ -69,7 +71,8 @@ export type HostAction =
   | LogQueryResultAction
   | LogQueryErrorAction
   | LogInfoAction
-  | TransferCompleteAction;
+  | TransferCompleteAction
+  | LogSanitizedEnvAction;
 
 export interface SubInvokeAction {
   readonly type: "SubInvoke";
@@ -82,6 +85,12 @@ export interface SubInvokeAction {
 export interface AbortAction {
   readonly type: "Abort";
   readonly message: string;
+}
+
+export interface LogSanitizedEnvAction {
+  readonly type: "LogSanitizedEnv";
+  readonly module: InvokableModules;
+  readonly result: ArrayBuffer;
 }
 
 export interface LogQueryResultAction {

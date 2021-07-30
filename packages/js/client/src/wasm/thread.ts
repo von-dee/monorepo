@@ -14,6 +14,7 @@ import {
 import { readBytes, readString, writeBytes, writeString } from "./utils";
 
 import * as MsgPack from "@msgpack/msgpack";
+import { InvokableModules } from "@web3api/core-js";
 
 interface State {
   method?: string;
@@ -260,6 +261,7 @@ addEventListener(
       threadMutexesBuffer: SharedArrayBuffer;
       threadId: number;
       transferBuffer: SharedArrayBuffer;
+      module: InvokableModules;
       clientEnvironment?: Record<string, unknown>;
       sanitizedEnvironment?: ArrayBuffer;
     };
@@ -316,12 +318,8 @@ addEventListener(
       } else {
         if (hasExport("_w3_sanitize_env", exports)) {
           state.sanitizeEnv.args = MsgPack.encode(
-            {
-              env: input.data.clientEnvironment,
-            },
-            {
-              ignoreUndefined: true,
-            }
+            { env: input.data.clientEnvironment },
+            { ignoreUndefined: true }
           );
 
           exports._w3_sanitize_env(state.sanitizeEnv.args.byteLength);
@@ -331,6 +329,13 @@ addEventListener(
             ignoreUndefined: true,
           });
         }
+
+        // dispatch sanitized enviroment to WasmWeb3Api
+        dispatchAction({
+          type: "LogSanitizedEnv",
+          module: input.data.module,
+          result: state.environment as ArrayBuffer,
+        });
       }
 
       exports._w3_load_env(state.environment.byteLength);

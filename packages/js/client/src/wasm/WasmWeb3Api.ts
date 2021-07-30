@@ -40,8 +40,10 @@ export class WasmWeb3Api extends Api {
     query?: ArrayBuffer;
     mutation?: ArrayBuffer;
   } = {};
-
-  private _sanitizedEnviroment?: ArrayBuffer;
+  private _sanitizedEnviroment: {
+    query?: ArrayBuffer;
+    mutation?: ArrayBuffer;
+  } = {};
 
   constructor(
     private _uri: Uri,
@@ -193,6 +195,10 @@ export class WasmWeb3Api extends Api {
                     resolve();
                     break;
                   }
+                  case "LogSanitizedEnv": {
+                    this._sanitizedEnviroment[action.module] = action.result;
+                    break;
+                  }
                   // TODO: replace with proper logging
                   case "LogInfo": {
                     break;
@@ -261,11 +267,12 @@ export class WasmWeb3Api extends Api {
           threadMutexesBuffer,
           threadId,
           transferBuffer,
+          module: module,
           clientEnvironment: this.getModuleEnvironment(
             module,
             this._clientEnvironment
           ),
-          sanitizedEnvironment: this._sanitizedEnviroment,
+          sanitizedEnvironment: this._sanitizedEnviroment[module],
         });
 
         await awaitCompletion;
