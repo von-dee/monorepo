@@ -26,6 +26,10 @@ interface State {
     result?: ArrayBuffer;
     error?: string;
   };
+  sanitizeEnv: {
+    args?: ArrayBuffer;
+    result?: ArrayBuffer;
+  };
   threadMutexes?: Int32Array;
   threadId?: number;
   transfer?: Uint8Array;
@@ -35,6 +39,7 @@ interface State {
 const state: State = {
   invoke: {},
   subinvoke: {},
+  sanitizeEnv: {},
 };
 
 const abort = (message: string) => {
@@ -215,6 +220,17 @@ const imports = (memory: WebAssembly.Memory): W3Imports => ({
         writeBytes(state.environment, memory.buffer, ptr);
       }
     },
+    __w3_sanitize_env_args: (ptr: u32): void => {
+      if (!state.sanitizeEnv.args) {
+        abort("__w3_sanitize_env: args is not set");
+        return;
+      }
+
+      writeBytes(state.sanitizeEnv.args, memory.buffer, ptr);
+    },
+    __w3_sanitize_env_result: (ptr: u32, len: u32): void => {
+      state.sanitizeEnv.result = readBytes(memory.buffer, ptr, len);
+    },
     __w3_abort: (
       msgPtr: u32,
       msgLen: u32,
@@ -284,14 +300,14 @@ addEventListener(
       return;
     }
 
+    // Initialize the Web3Api module
+    exports._w3_init();
+
     // Make sure _w3_invoke exists
     if (!hasExport("_w3_invoke", exports)) {
       abort(`A required export was not found: _w3_invoke`);
       return;
     }
-
-    // Initialize the Web3Api module
-    exports._w3_init();
 
     // Load environment if _w3_load_env exists
     if (hasExport("_w3_load_env", exports)) {
@@ -299,7 +315,7 @@ addEventListener(
         state.environment = input.data.sanitizedEnvironment;
       } else {
         if (hasExport("_w3_sanitize_env", exports)) {
-          state.args = MsgPack.encode(
+          state.sanitizeEnv.args = MsgPack.encode(
             {
               env: input.data.clientEnvironment,
             },
@@ -307,9 +323,9 @@ addEventListener(
               ignoreUndefined: true,
             }
           );
-          state.method = "sanitizeQueryEnv";
-          exports._w3_sanitize_env(state.method.length, state.args.byteLength);
-          state.environment = state.invoke.result as ArrayBuffer;
+
+          exports._w3_sanitize_env(state.sanitizeEnv.args.byteLength);
+          state.environment = state.sanitizeEnv.result as ArrayBuffer;
         } else {
           state.environment = MsgPack.encode(input.data.clientEnvironment, {
             ignoreUndefined: true,

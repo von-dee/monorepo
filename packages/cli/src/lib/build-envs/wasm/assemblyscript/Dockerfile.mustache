@@ -13,6 +13,7 @@ WORKDIR /project
 # when just the Web3API schema & implementation files change
 COPY package.json .
 RUN yarn
+RUN yarn add @mpetrun5/wasm-as
 
 # Copy all manifest files
 {{#web3api_manifests}}

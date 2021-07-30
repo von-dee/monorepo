@@ -444,6 +444,8 @@ export class Compiler {
         __w3_invoke_error: () => {},
         __w3_abort: () => {},
         __w3_load_env: () => {},
+        __w3_sanitize_env_args: () => {},
+        __w3_sanitize_env_result: () => {},
       },
     });
 
