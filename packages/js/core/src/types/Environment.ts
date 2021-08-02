@@ -1,4 +1,4 @@
-import { Uri } from ".";
+import { InvokableModules, Uri } from ".";
 
 import { Tracer } from "@web3api/tracing-js";
 
@@ -31,3 +31,28 @@ export const sanitizeEnvironments = Tracer.traceFunc(
     return output;
   }
 );
+
+export function getModuleEnvironment(
+  module: InvokableModules,
+  environment?: Environment<Uri>
+): Record<string, unknown> {
+  if (!environment) {
+    return {};
+  }
+
+  const env: Record<string, unknown> = environment.common
+    ? environment.common
+    : {};
+
+  if (module === "query") {
+    return {
+      ...env,
+      ...environment.query,
+    };
+  } else {
+    return {
+      ...env,
+      ...environment.mutation,
+    };
+  }
+}

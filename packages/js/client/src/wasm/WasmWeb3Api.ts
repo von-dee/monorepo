@@ -20,6 +20,7 @@ import {
   InvokableModules,
   Environment,
   UriResolver,
+  getModuleEnvironment,
 } from "@web3api/core-js";
 import * as MsgPack from "@msgpack/msgpack";
 import { Tracer } from "@web3api/tracing-js";
@@ -268,7 +269,7 @@ export class WasmWeb3Api extends Api {
           threadId,
           transferBuffer,
           module: module,
-          clientEnvironment: this.getModuleEnvironment(
+          clientEnvironment: getModuleEnvironment(
             module,
             this._clientEnvironment
           ),
@@ -462,30 +463,5 @@ export class WasmWeb3Api extends Api {
     }
 
     return a + b;
-  }
-
-  private getModuleEnvironment(
-    module: InvokableModules,
-    environment?: Environment<Uri>
-  ): Record<string, unknown> {
-    if (!environment) {
-      return {};
-    }
-
-    const env: Record<string, unknown> = environment.common
-      ? environment.common
-      : {};
-
-    if (module === "query") {
-      return {
-        ...env,
-        ...environment.query,
-      };
-    } else {
-      return {
-        ...env,
-        ...environment.mutation,
-      };
-    }
   }
 }
