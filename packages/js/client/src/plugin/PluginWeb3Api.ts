@@ -1,8 +1,10 @@
 import {
   Api,
   Client,
+  Environment,
   executeMaybeAsyncFunction,
   filterResults,
+  getModuleEnvironment,
   InvokeApiOptions,
   InvokeApiResult,
   Plugin,
@@ -15,13 +17,18 @@ import { Tracer } from "@web3api/tracing-js";
 export class PluginWeb3Api extends Api {
   private _instance: Plugin | undefined;
 
-  constructor(private _uri: Uri, private _plugin: PluginPackage) {
+  constructor(
+    private _uri: Uri,
+    private _plugin: PluginPackage,
+    private _clientEnviroment?: Environment<Uri>
+  ) {
     super();
 
     Tracer.startSpan("PluginWeb3Api: constructor");
     Tracer.setAttribute("input", {
       uri: this._uri,
       plugin: this._plugin,
+      clientEnvironment: this._clientEnviroment,
     });
     Tracer.endSpan();
   }
@@ -46,6 +53,20 @@ export class PluginWeb3Api extends Api {
 
         if (!pluginModule[method]) {
           throw new Error(`PluginWeb3Api: method "${method}" not found.`);
+        }
+
+        if (pluginModule["loadEnv"]) {
+          let env = getModuleEnvironment(module, this._clientEnviroment);
+          const sanitizationMethod =
+            module == "query" ? "sanitizeQueryEnv" : "sanitizeMutationEnv";
+          if (pluginModule[sanitizationMethod]) {
+            env = pluginModule[sanitizationMethod](env, client) as Record<
+              string,
+              unknown
+            >;
+          }
+
+          pluginModule["loadEnv"](env, client);
         }
 
         let jsInput: Record<string, unknown>;

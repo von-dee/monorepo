@@ -36,6 +36,21 @@ type PluginModulesType = {
 /** The plugin's query "modules" */
 export type PluginModules = PluginModulesType;
 
+export interface Plugin {
+  /**
+   * Sanitize plugin environment.
+   *
+   * @param env Module environment to be sanitized
+   */
+  sanitizeEnv?(env: Record<string, unknown>): Record<string, unknown>;
+  /**
+   * Load module enviroment to be used
+   *
+   * @param env module enviroment to be set inside plugin
+   */
+  loadEnv?(env: Record<string, unknown>): void;
+}
+
 /**
  * The plugin instance.
  */
