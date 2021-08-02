@@ -38,17 +38,17 @@ export type PluginModules = PluginModulesType;
 
 export interface Plugin {
   /**
-   * Sanitize plugin environment.
+   * Sanitize plugin environment
    *
    * @param env Module environment to be sanitized
    */
-  sanitizeEnv?(env: Record<string, unknown>): Record<string, unknown>;
+  sanitizeEnv?(env: Record<string, unknown>): Promise<Record<string, unknown>>;
   /**
-   * Load module enviroment to be used
+   * Load module enviroment to be used inside plugin
    *
-   * @param env module enviroment to be set inside plugin
+   * @param env module environment to be set inside plugin
    */
-  loadEnv?(env: Record<string, unknown>): void;
+  loadEnv?(env: Record<string, unknown>): Promise<void>;
 }
 
 /**

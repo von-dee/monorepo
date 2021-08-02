@@ -55,20 +55,6 @@ export class PluginWeb3Api extends Api {
           throw new Error(`PluginWeb3Api: method "${method}" not found.`);
         }
 
-        if (pluginModule["loadEnv"]) {
-          let env = getModuleEnvironment(module, this._clientEnviroment);
-          const sanitizationMethod =
-            module == "query" ? "sanitizeQueryEnv" : "sanitizeMutationEnv";
-          if (pluginModule[sanitizationMethod]) {
-            env = pluginModule[sanitizationMethod](env, client) as Record<
-              string,
-              unknown
-            >;
-          }
-
-          pluginModule["loadEnv"](env, client);
-        }
-
         let jsInput: Record<string, unknown>;
 
         // If the input is a msgpack buffer, deserialize it
@@ -89,6 +75,25 @@ export class PluginWeb3Api extends Api {
         }
 
         try {
+          if (pluginModule["loadEnv"]) {
+            let env = getModuleEnvironment(module, this._clientEnviroment);
+            const sanitizationMethod =
+              module == "query" ? "sanitizeQueryEnv" : "sanitizeMutationEnv";
+            if (pluginModule[sanitizationMethod]) {
+              env = (await executeMaybeAsyncFunction(
+                pluginModule[sanitizationMethod],
+                env,
+                client
+              )) as Record<string, unknown>;
+            }
+
+            await executeMaybeAsyncFunction(
+              pluginModule["loadEnv"],
+              env,
+              client
+            );
+          }
+
           const result = (await executeMaybeAsyncFunction(
             pluginModule[method],
             jsInput,
