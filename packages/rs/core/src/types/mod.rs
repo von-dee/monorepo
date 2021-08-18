@@ -12,3 +12,6 @@ pub mod uri_redirect;
 
 pub trait QueryHandler {}
 pub trait InvokeHandler {}
+
+pub use client::Client;
+pub use invoke::{InvokeApiOptions, InvokeApiResult};
