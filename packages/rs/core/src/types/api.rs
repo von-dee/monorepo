@@ -17,7 +17,7 @@ impl Api {
     /// This client will be used for any sub-queries that occur.
     /// TODO: Use Futures
     pub async fn invoke<T>(
-        _options: InvokeApiOptions<'_, T>,
+        _options: InvokeApiOptions<T>,
         _client: &dyn Client,
     ) -> InvokeApiResult<T> {
         unimplemented!()

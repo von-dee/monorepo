@@ -4,10 +4,10 @@
 
 /// URI configuration
 #[derive(Debug, Clone, Default)]
-pub struct UriConfig<'a> {
-    authority: &'a str,
-    path: &'a str,
-    uri: &'a str,
+pub struct UriConfig {
+    authority: String,
+    path: String,
+    uri: String,
 }
 
 /// A Polywrap URI. Some examples of valid URIs are:
@@ -21,27 +21,27 @@ pub struct UriConfig<'a> {
 /// **ipfs/** - URI Authority: allows the Polywrap URI resolution algorithm to determine an authoritative URI resolver.
 /// **sub.domain.eth** - URI Path: tells the Authority where the API resides.
 #[derive(Debug, Clone, Default)]
-pub struct Uri<'a> {
-    config: UriConfig<'a>,
+pub struct Uri {
+    config: UriConfig,
 }
 
-impl<'a> Uri<'a> {
-    pub fn new(uri: &'a str) -> Self {
+impl Uri {
+    pub fn new(uri: &str) -> Self {
         Uri {
             config: Uri::parse_uri(uri).expect("Failed to parse URI"),
         }
     }
 
-    pub fn get_authority(&self) -> &str {
-        self.config.authority
+    pub fn get_authority(&self) -> String {
+        self.config.authority.clone()
     }
 
-    pub fn get_path(&self) -> &str {
-        self.config.path
+    pub fn get_path(&self) -> String {
+        self.config.path.clone()
     }
 
-    pub fn get_uri(&self) -> &str {
-        self.config.uri
+    pub fn get_uri(&self) -> String {
+        self.config.uri.clone()
     }
 
     pub fn equals(a: Self, b: Self) -> bool {

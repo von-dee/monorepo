@@ -4,28 +4,28 @@ use std::collections::HashMap;
 //pub type InvokableModules<'a> = Option<&'a str>; ???
 
 #[derive(Debug, Clone)]
-pub enum InvokableModules<'a> {
-    Mutation(&'a str),
-    Query(&'a str),
+pub enum InvokableModules {
+    Mutation(String),
+    Query(String),
 }
 
 /// Options required for an API invocation
 #[derive(Debug, Clone)]
-pub struct InvokeApiOptions<'a, T> {
+pub struct InvokeApiOptions<T> {
     /// The API's URI
-    uri: Uri<'a>,
+    uri: Uri,
     /// Module to be called into
-    module: InvokableModules<'a>,
+    module: InvokableModules,
     /// Method to be executed
-    method: &'a str,
+    method: String,
     /// Input arguments for the method, structured as a map,
     /// removing the chance of incorrectly ordering arguments.
-    input: HashMap<&'a str, Vec<u8>>,
+    input: HashMap<String, Vec<u8>>,
     /// Filters the [[InvokeApiResult]] data properties. The key
     /// of this map is the property's name, while the value is
     /// either true (meaning select this prop), or a nested named map,
     /// allowing for the filtering of nested objects.
-    result_filer: HashMap<&'a str, Option<T>>,
+    result_filer: HashMap<String, Option<T>>,
     /// If set to true, the invoke function will decode all msgpack results
     /// into objects
     decode: Option<bool>,

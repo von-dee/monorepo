@@ -1,12 +1,22 @@
 use super::Uri;
 use polywrap_tracing_rs::Tracer;
 
-#[derive(Debug)]
-pub struct InterfaceImplementations<'a> {
-    interface: Uri<'a>,
-    implementations: Vec<Uri<'a>>,
+#[derive(Clone, Debug)]
+pub struct InterfaceImplementations {
+    interface: Uri,
+    implementations: Vec<Uri>,
 }
 
 pub fn sanitize_interface_implementations(_tracer: Tracer) {
-    todo!()
+    // TODO: let input = tracer.trace_func(args: T, span: &'static str, func: fn(args: T) -> Result<T, Error>);
+    let input: Vec<InterfaceImplementations> = vec![];
+    let mut output: Vec<InterfaceImplementations> = vec![];
+    for definition in input {
+        let interface_uri = Uri::new(&definition.interface.get_uri());
+        let implementations = definition.implementations;
+        output.push(InterfaceImplementations {
+            interface: interface_uri,
+            implementations,
+        });
+    }
 }
