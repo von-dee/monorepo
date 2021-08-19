@@ -15,3 +15,4 @@ pub trait InvokeHandler {}
 
 pub use client::Client;
 pub use invoke::{InvokeApiOptions, InvokeApiResult};
+pub use uri::Uri;
