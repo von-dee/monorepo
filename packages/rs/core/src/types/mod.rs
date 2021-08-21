@@ -10,10 +10,11 @@ pub mod query;
 pub mod uri;
 pub mod uri_redirect;
 
-pub trait QueryHandler {}
-pub trait InvokeHandler {}
+pub trait QueryHandler: Clone {}
+pub trait InvokeHandler: Clone {}
 
 pub use client::Client;
 pub use invoke::{InvokableModules, InvokeApiOptions, InvokeApiResult};
 pub use maybe_async::MaybeAsync;
+pub use plugin::PluginPackage;
 pub use uri::Uri;

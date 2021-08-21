@@ -21,7 +21,7 @@ pub type PluginModulesType<InvokableModules> = PluginModule<InvokableModules>;
 pub type PluginModules<InvokableModules> = PluginModulesType<InvokableModules>;
 
 /// The plugin instance
-pub trait Plugin {
+pub trait Plugin: Clone {
     /// Get an instance of this plugin's modules
     /// @param client: The client instance requesting the modules.
     /// This client will be used for any sub-queries that occur.
@@ -34,6 +34,7 @@ pub trait Plugin {
 }
 
 /// The plugin package's manifest
+#[derive(Clone)]
 pub struct PluginPackageManifest {
     /// The API's schema
     pub schema: String,
@@ -41,8 +42,9 @@ pub struct PluginPackageManifest {
     pub implements: Vec<Uri>,
 }
 
+#[derive(Clone)]
 pub struct PluginPackage {
-    pub factory: Box<dyn Plugin>,
+    pub factory: Client,
     pub manifest: PluginPackageManifest,
 }
 
