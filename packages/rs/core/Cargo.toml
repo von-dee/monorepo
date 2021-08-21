@@ -7,8 +7,9 @@ repository = "https://github.com/polywrap/monorepo"
 license = "MIT"
 edition = "2018"
 
+[dependencies]
+futures = "0.3.16"
+polywrap-tracing-rs = { path = "../tracing" }
+
 [lib]
 crate-type = ["cdylib", "rlib"]
-
-[dependencies]
-polywrap-tracing-rs = { path = "../tracing" }
