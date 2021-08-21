@@ -14,5 +14,6 @@ pub trait QueryHandler {}
 pub trait InvokeHandler {}
 
 pub use client::Client;
-pub use invoke::{InvokeApiOptions, InvokeApiResult};
+pub use invoke::{InvokableModules, InvokeApiOptions, InvokeApiResult};
+pub use maybe_async::MaybeAsync;
 pub use uri::Uri;
