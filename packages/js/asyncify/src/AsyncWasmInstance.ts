@@ -58,22 +58,29 @@ export class AsyncWasmInstance {
   private _wrappedExports: AsyncifyExports;
   private _returnValue: Promise<unknown> | unknown;
 
-  constructor(config: {
+  protected constructor() {}
+
+  get exports(): WasmExports {
+    return this._wrappedExports;
+  }
+
+  public static async create(config: {
     module: WasmModule;
     imports: WasmImports;
     requiredExports?: readonly string[];
-  }) {
+  }): Promise<AsyncWasmInstance> {
+    const instance = new AsyncWasmInstance()
     // Wrap imports
-    this._wrappedImports = this._wrapImports(config.imports);
+    instance._wrappedImports = instance._wrapImports(config.imports);
 
     // Create Wasm module instance
-    this._instance = new WebAssembly.Instance(
+    instance._instance = await WebAssembly.instantiate(
       config.module,
-      this._wrappedImports
-    );
+      instance._wrappedImports
+      );
 
     // Ensure all required exports exist on Wasm module
-    const exportKeys = Object.keys(this._instance.exports);
+    const exportKeys = Object.keys(instance._instance.exports);
     const missingExports = [
       ...AsyncWasmInstance.requiredExports,
       ...(config.requiredExports || []),
@@ -85,10 +92,10 @@ export class AsyncWasmInstance {
       );
     }
 
-    const exports = this._instance.exports as AsyncifyExports;
+    const exports = instance._instance.exports as AsyncifyExports;
 
     // Wrap exports
-    this._wrappedExports = this._wrapExports(exports);
+    instance._wrappedExports = instance._wrapExports(exports);
 
     // Initialize Asyncify stack pointers
     const memory = (exports.memory ||
@@ -98,10 +105,8 @@ export class AsyncWasmInstance {
       AsyncWasmInstance._dataStart,
       AsyncWasmInstance._dataEnd,
     ]);
-  }
 
-  get exports(): WasmExports {
-    return this._wrappedExports;
+    return instance
   }
 
   private _getAsyncifyState(): AsyncifyState {
