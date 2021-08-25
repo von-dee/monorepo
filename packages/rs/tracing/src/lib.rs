@@ -8,6 +8,7 @@ use opentelemetry::sdk::trace::TracerProvider as Tp;
 use opentelemetry::sdk::trace::*;
 use opentelemetry::trace::Tracer as OpTracer;
 use opentelemetry::trace::TracerProvider;
+use serde::Serialize;
 //use opentelemetry_zipkin::Exporter;
 
 pub type MaybeAsync<T> = OptionFuture<T>;
@@ -66,11 +67,7 @@ impl Tracer {
         Ok(())
     }
 
-    pub fn set_attribute<T: serde::ser::Serialize>(
-        &mut self,
-        _attr_name: &str,
-        data: T,
-    ) -> Result<(), &str> {
+    pub fn set_attribute<T: Serialize>(&mut self, _attr_name: &str, data: T) -> Result<(), &str> {
         if !self.trace_enabled {
             return Err("");
         }
@@ -82,11 +79,7 @@ impl Tracer {
         Ok(())
     }
 
-    pub fn add_event<T: serde::ser::Serialize>(
-        &mut self,
-        _event: &str,
-        data: T,
-    ) -> Result<(), &str> {
+    pub fn add_event<T: Serialize>(&mut self, _event: &str, data: T) -> Result<(), &str> {
         if !self.trace_enabled {
             return Err("");
         }
@@ -114,29 +107,12 @@ impl Tracer {
     }
 
     // TODO: Refactor
-    pub fn trace_func<T: Clone + serde::ser::Serialize>(
+    pub fn trace_func<T: Clone + Serialize>(
         &mut self,
-        args: T,
-        span: &'static str,
-        func: fn(args: T) -> Result<T, Error>,
-    ) -> Result<(), Error> {
-        if let Ok(some_val) = func(args.clone()) {
-            self.start_span(span).unwrap();
-            self.set_attribute("input", args).unwrap();
-            let result = func(some_val);
-            // TODO: Use Futures
-            match result {
-                Ok(output) => {
-                    self.set_attribute("output", output).unwrap();
-                    self.end_span().unwrap();
-                }
-                Err(_error) => {}
-            }
-        } else if let Err(error) = func(args) {
-            self.record_exception(error).unwrap();
-            self.end_span().unwrap();
-        }
-        Ok(())
+        _span: &'static str,
+        _func: impl FnMut(&mut Self, &T) -> T,
+    ) -> Result<T, Error> {
+        todo!()
     }
 
     pub fn init_provider(&mut self) -> Result<(), &str> {
