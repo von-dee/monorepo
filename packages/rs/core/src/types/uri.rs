@@ -3,11 +3,11 @@
 // use tracing::Tracer when it's implemented
 
 /// URI configuration
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct UriConfig {
-    authority: String,
-    path: String,
-    uri: String,
+    pub authority: Option<String>,
+    pub path: Option<String>,
+    pub uri: Option<String>,
 }
 
 /// A Polywrap URI. Some examples of valid URIs are:
@@ -20,7 +20,7 @@ pub struct UriConfig {
 /// **w3://** - URI Scheme: differentiates Polywrap URIs.
 /// **ipfs/** - URI Authority: allows the Polywrap URI resolution algorithm to determine an authoritative URI resolver.
 /// **sub.domain.eth** - URI Path: tells the Authority where the API resides.
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Uri {
     config: UriConfig,
 }
@@ -33,19 +33,19 @@ impl Uri {
     }
 
     pub fn get_authority(&self) -> String {
-        self.config.authority.clone()
+        self.config.authority.as_ref().unwrap().to_string()
     }
 
     pub fn get_path(&self) -> String {
-        self.config.path.clone()
+        self.config.path.as_ref().unwrap().to_string()
     }
 
     pub fn get_uri(&self) -> String {
-        self.config.uri.clone()
+        self.config.uri.as_ref().unwrap().to_string()
     }
 
     pub fn equals(a: Self, b: Self) -> bool {
-        a.get_uri() == b.get_uri()
+        a.config.uri == b.config.uri
     }
 
     pub fn is_uri<T>(_value: T) -> bool {
@@ -53,12 +53,8 @@ impl Uri {
     }
 
     pub fn is_valid_uri(uri: &str, parsed: Option<UriConfig>) -> bool {
-        //matches!(Uri::parse_uri(uri), Ok(_))
-        if Uri::parse_uri(uri).is_ok() {
-            if parsed.is_some() {
-                // What is: parse = Object.assign(parsed, result) ?
-            }
-            true
+        if let Ok(result) = Uri::parse_uri(uri) {
+            parsed.unwrap() == result
         } else {
             false
         }
