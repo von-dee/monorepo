@@ -1,14 +1,16 @@
-use futures::future::OptionFuture;
+use futures::future::Future;
 
-pub type MaybeAsync<T> = OptionFuture<T>;
-
-pub fn is_promise<T>(_test: MaybeAsync<T>) -> bool {
+pub fn is_promise<T>(_test: T) -> bool {
     todo!()
 }
 
-pub async fn execute_maybe_async_function<T>(
-    _func: fn(args: [T]) -> MaybeAsync<T>,
-    _args: &[T],
+pub async fn execute_maybe_async_function<T: Future + Future<Output = T> + Copy + Clone>(
+    func: fn(args: &[T]) -> T,
+    args: &[T],
 ) -> T {
-    todo!()
+    let mut result = func(args);
+    if is_promise(result) {
+        result = result.await;
+    }
+    result
 }
