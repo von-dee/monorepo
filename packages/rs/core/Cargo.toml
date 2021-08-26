@@ -9,7 +9,9 @@ edition = "2018"
 
 [dependencies]
 futures = "0.3.16"
+lazy_static = "1.4.0"
 polywrap-tracing-rs = { path = "../tracing" }
+regex = "1.5.4"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
