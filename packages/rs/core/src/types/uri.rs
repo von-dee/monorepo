@@ -91,9 +91,14 @@ impl Uri {
             .find(&processed);
 
         // Remove whitespaces
-        if let Ok(re) = Regex::new(r"w3://([a-z][a-z0-9-_]+)/(.*)") {
-            result = re.as_str().chars().filter(|c| !c.is_whitespace()).collect()
-        } else if re.is_none() || re.unwrap().as_str().len() != 3 {
+        if re.is_some() {
+            result = re
+                .expect("")
+                .as_str()
+                .chars()
+                .filter(|c| !c.is_whitespace())
+                .collect()
+        } else if re.is_none() {
             let uri_received = format!("Invalid URI Received: {}", uri);
             let error = format!(
                 "{}\n{}\n{}\n{}\n\n{}",
