@@ -29,7 +29,7 @@ pub trait Plugin: Clone {
     where
         Self: Sized,
     {
-        todo!()
+        unimplemented!()
     }
 }
 
