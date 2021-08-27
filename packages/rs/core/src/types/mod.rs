@@ -19,3 +19,4 @@ pub use invoke::{InvokableModules, InvokeApiOptions, InvokeApiResult};
 pub use plugin::PluginPackage;
 pub use plugin_registration::PluginRegistration;
 pub use uri::Uri;
+pub use uri_redirect::UriRedirect;

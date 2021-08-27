@@ -2,9 +2,10 @@
 
 // use tracing::Tracer when it's implemented
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
 /// URI configuration
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct UriConfig {
     pub authority: Option<String>,
     pub path: Option<String>,
@@ -21,9 +22,9 @@ pub struct UriConfig {
 /// **w3://** - URI Scheme: differentiates Polywrap URIs.
 /// **ipfs/** - URI Authority: allows the Polywrap URI resolution algorithm to determine an authoritative URI resolver.
 /// **sub.domain.eth** - URI Path: tells the Authority where the API resides.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Uri {
-    config: UriConfig,
+    pub config: UriConfig,
 }
 
 impl Uri {
@@ -118,5 +119,35 @@ impl Uri {
             authority: Some(result.clone()),
             path: Some(result),
         })
+    }
+}
+
+impl std::fmt::Display for UriConfig {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> core::fmt::Result {
+        let mut formatted = String::new();
+        formatted.push_str(&format!(
+            "{{\
+			authority: {:#?}, \
+			path: {:?}, \
+			uri: {}, \
+			}}",
+            self.authority.as_ref().unwrap(),
+            self.path.as_ref().unwrap(),
+            self.uri.as_ref().unwrap(),
+        ));
+        write!(f, "{}", formatted)
+    }
+}
+
+impl std::fmt::Display for Uri {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> core::fmt::Result {
+        let mut formatted = String::new();
+        formatted.push_str(&format!(
+            "{{\
+			config: {:#?}, \
+			}}",
+            self.config,
+        ));
+        write!(f, "{}", formatted)
     }
 }
