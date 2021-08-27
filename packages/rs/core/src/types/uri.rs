@@ -45,7 +45,7 @@ impl Uri {
         self.config.uri.as_ref().unwrap().to_string()
     }
 
-    pub fn equals(a: Self, b: Self) -> bool {
+    pub fn equals(a: &Self, b: &Self) -> bool {
         a.config.uri == b.config.uri
     }
 

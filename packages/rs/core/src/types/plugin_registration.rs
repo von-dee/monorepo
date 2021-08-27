@@ -2,8 +2,8 @@ use super::{PluginPackage, Uri};
 
 #[derive(Clone)]
 pub struct PluginRegistration {
-    uri: Uri,
-    plugin: PluginPackage,
+    pub uri: Uri,
+    pub plugin: PluginPackage,
 }
 
 pub fn sanitize_plugin_registrations(
