@@ -1,4 +1,5 @@
 use super::{error::Error, uri::Uri};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub trait InvokeHandler<T>: Clone {
@@ -8,14 +9,14 @@ pub trait InvokeHandler<T>: Clone {
     fn invoke<F>(&mut self, _options: InvokeApiOptions<F>) -> InvokeApiResult<F>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum InvokableModules {
     Mutation(String),
     Query(String),
 }
 
 /// Options required for an API invocation
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InvokeApiOptions<T> {
     /// The API's URI
     pub uri: Uri,
