@@ -2,8 +2,8 @@ use super::Uri;
 
 #[derive(Clone, Debug)]
 pub struct InterfaceImplementations {
-    interface: Uri,
-    implementations: Vec<Uri>,
+    pub interface: Uri,
+    pub implementations: Vec<Uri>,
 }
 
 pub fn sanitize_interface_implementations(

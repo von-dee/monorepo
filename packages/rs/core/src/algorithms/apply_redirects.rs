@@ -1,7 +1,7 @@
 use crate::types::{Uri, UriRedirect};
 use std::collections::HashMap;
 
-pub fn apply_redirects(uri: Uri, redirects: &[UriRedirect]) -> Result<Uri, String> {
+pub fn apply_redirects(uri: &Uri, redirects: &[UriRedirect]) -> Result<Uri, String> {
     // Keep track of past redirects (from -> to) to find the final uri
     let mut redirect_from_to_map: HashMap<String, Uri> = HashMap::new();
     for redirect in redirects {
