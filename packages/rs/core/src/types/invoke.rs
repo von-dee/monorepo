@@ -1,7 +1,12 @@
 use super::{error::Error, uri::Uri};
 use std::collections::HashMap;
 
-//pub type InvokableModules<'a> = Option<&'a str>; ???
+pub trait InvokeHandler<T>: Clone {
+    // fn invoke_str<F>(options: InvokeApiOptions<&str>) -> InvokeApiResult<F> {
+    //     unimplemented!()
+    // }
+    fn invoke<F>(&mut self, _options: InvokeApiOptions<F>) -> InvokeApiResult<F>;
+}
 
 #[derive(Debug, Clone)]
 pub enum InvokableModules {
@@ -13,22 +18,22 @@ pub enum InvokableModules {
 #[derive(Debug, Clone)]
 pub struct InvokeApiOptions<T> {
     /// The API's URI
-    uri: Uri,
+    pub uri: Uri,
     /// Module to be called into
-    module: InvokableModules,
+    pub module: InvokableModules,
     /// Method to be executed
-    method: String,
+    pub method: String,
     /// Input arguments for the method, structured as a map,
     /// removing the chance of incorrectly ordering arguments.
-    input: HashMap<String, Vec<u8>>,
+    pub input: HashMap<String, Vec<u8>>,
     /// Filters the [[InvokeApiResult]] data properties. The key
     /// of this map is the property's name, while the value is
     /// either true (meaning select this prop), or a nested named map,
     /// allowing for the filtering of nested objects.
-    result_filer: HashMap<String, Option<T>>,
+    pub result_filer: Option<HashMap<String, T>>,
     /// If set to true, the invoke function will decode all msgpack results
     /// into objects
-    decode: Option<bool>,
+    pub decode: Option<bool>,
 }
 
 /// Result of an API invokation
@@ -39,10 +44,4 @@ pub struct InvokeApiResult<T> {
     data: Option<T>,
     /// Errors encountered during invocation
     error: Option<Error>,
-}
-
-// TODO: Use Futures
-pub trait InvokeHandler<T> {
-    fn invoke_str<F>(options: InvokeApiOptions<&str>) -> InvokeApiResult<F>;
-    fn invoke_uri<F>(options: InvokeApiOptions<Uri>) -> InvokeApiResult<F>;
 }

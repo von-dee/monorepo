@@ -1,6 +1,13 @@
-use super::{InvokeHandler, QueryHandler};
+use super::invoke::{InvokeApiOptions, InvokeApiResult, InvokeHandler};
+use super::QueryHandler;
 
-#[derive(Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Client;
-impl InvokeHandler for Client {}
+impl<T> InvokeHandler<T> for Client {
+    fn invoke<F>(&mut self, _options: InvokeApiOptions<F>) -> InvokeApiResult<F> {
+        unimplemented!()
+    }
+}
 impl QueryHandler for Client {}
