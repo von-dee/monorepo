@@ -1,5 +1,5 @@
 use super::invoke::{InvokeApiOptions, InvokeApiResult, InvokeHandler};
-use super::QueryHandler;
+use super::query::QueryHandler;
 
 use serde::{Deserialize, Serialize};
 
