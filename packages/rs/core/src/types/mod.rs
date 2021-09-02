@@ -14,6 +14,6 @@ pub use invoke::{InvokableModules, InvokeApiOptions, InvokeApiResult, InvokeHand
 pub use interface_implementations::InterfaceImplementations;
 pub use plugin::PluginPackage;
 pub use plugin_registration::PluginRegistration;
-pub use query::QueryHandler;
+pub use query::{QueryApiInvocations, QueryDocument, QueryHandler};
 pub use uri::Uri;
 pub use uri_redirect::UriRedirect;

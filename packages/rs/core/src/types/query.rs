@@ -1,4 +1,4 @@
-use super::{InvokeApiOptions, Uri};
+use super::Uri;
 use graphql_parser::{
     parse_query,
     query::{Document, Text},
@@ -48,6 +48,6 @@ pub struct QueryApiResult<T> {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct QueryApiInvocations<T> {
-    pub method_or_alias: InvokeApiOptions<T>,
+pub struct QueryApiInvocations {
+    //pub method_or_alias: InvokeApiOptions<T>,
 }
