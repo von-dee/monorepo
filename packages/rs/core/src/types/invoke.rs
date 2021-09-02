@@ -1,11 +1,8 @@
-use super::{error::Error, uri::Uri};
+use super::uri::Uri;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub trait InvokeHandler<T>: Clone {
-    // fn invoke_str<F>(options: InvokeApiOptions<&str>) -> InvokeApiResult<F> {
-    //     unimplemented!()
-    // }
     fn invoke<F>(&mut self, _options: InvokeApiOptions<F>) -> InvokeApiResult<F>;
 }
 
@@ -44,5 +41,5 @@ pub struct InvokeApiResult<T> {
     /// of the method.
     data: Option<T>,
     /// Errors encountered during invocation
-    error: Option<Error>,
+    error: Option<String>,
 }

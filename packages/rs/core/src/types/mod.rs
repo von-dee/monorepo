@@ -1,6 +1,5 @@
 pub mod api;
 pub mod client;
-pub mod error;
 pub mod interface_implementations;
 pub mod invoke;
 pub mod maybe_async;
