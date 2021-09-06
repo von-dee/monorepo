@@ -8,10 +8,11 @@ pub mod plugin_registration;
 pub mod query;
 pub mod uri;
 pub mod uri_redirect;
+
 pub use client::Client;
-pub use invoke::{InvokableModules, InvokeApiOptions, InvokeApiResult, InvokeHandler};
-//pub use maybe_async::MaybeAsync;
 pub use interface_implementations::InterfaceImplementations;
+pub use invoke::{InvokableModules, InvokeApiOptions, InvokeApiResult, InvokeHandler};
+pub use maybe_async::MaybeAsync;
 pub use plugin::PluginPackage;
 pub use plugin_registration::PluginRegistration;
 pub use query::{QueryApiInvocations, QueryDocument, QueryHandler};

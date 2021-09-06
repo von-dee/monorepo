@@ -1,16 +1,15 @@
-use futures::future::Future;
+use futures::future::{Future, OptionFuture};
+
+// MaybeAsync may not be necessary in Rust
+pub type MaybeAsync<T> = OptionFuture<T>;
 
 pub fn is_promise<T>(_test: T) -> bool {
     todo!()
 }
 
-pub async fn execute_maybe_async_function<T: Future + Future<Output = T> + Copy + Clone>(
-    func: fn(args: &[T]) -> T,
-    args: &[T],
-) -> T {
-    let mut result = func(args);
-    if is_promise(result) {
-        result = result.await;
-    }
-    result
+pub async fn execute_maybe_async_function<T>(func: fn(args: &[T]) -> T, args: &[T]) -> T
+where
+    T: Future + Future<Output = T> + Copy + Clone,
+{
+    func(args)
 }

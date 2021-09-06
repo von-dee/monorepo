@@ -1,6 +1,5 @@
 //! URI type
 
-// use tracing::Tracer when it's implemented
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -19,12 +18,12 @@ pub struct UriConfig {
 /// w3://uns/domain.crypto
 /// Breaking down the various parts of the URI, as it applies
 /// to [the URI standard](https://tools.ietf.org/html/rfc3986#section-3):
-/// **w3://** - URI Scheme: differentiates Polywrap URIs.
-/// **ipfs/** - URI Authority: allows the Polywrap URI resolution algorithm to determine an authoritative URI resolver.
-/// **sub.domain.eth** - URI Path: tells the Authority where the API resides.
+/// [w3://] - URI Scheme: differentiates Polywrap URIs.
+/// [ipfs/] - URI Authority: allows the Polywrap URI resolution algorithm to determine an authoritative URI resolver.
+/// [sub.domain.eth] - URI Path: tells the Authority where the API resides.
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Uri {
-    pub config: UriConfig,
+    config: UriConfig,
 }
 
 impl Uri {
@@ -50,6 +49,7 @@ impl Uri {
         a.config.uri == b.config.uri
     }
 
+    // This function may not be necessary in Rust
     pub fn is_uri<T>(_value: T) -> bool {
         todo!()
     }

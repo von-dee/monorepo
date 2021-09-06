@@ -1,0 +1,23 @@
+/home/nubian/pentangeli/Work/polywrap/monorepo/packages/wasm/rs/target/debug/deps/libpolywrap_wasm_rs.rlib: src/lib.rs src/abort.rs src/invoke.rs src/memory.rs src/msgpack/mod.rs src/msgpack/context.rs src/msgpack/data_view.rs src/msgpack/format.rs src/msgpack/read.rs src/msgpack/read_decoder.rs src/msgpack/utils.rs src/msgpack/write.rs src/msgpack/write_encoder.rs src/msgpack/write_sizer.rs src/subinvoke.rs
+
+/home/nubian/pentangeli/Work/polywrap/monorepo/packages/wasm/rs/target/debug/deps/libpolywrap_wasm_rs.a: src/lib.rs src/abort.rs src/invoke.rs src/memory.rs src/msgpack/mod.rs src/msgpack/context.rs src/msgpack/data_view.rs src/msgpack/format.rs src/msgpack/read.rs src/msgpack/read_decoder.rs src/msgpack/utils.rs src/msgpack/write.rs src/msgpack/write_encoder.rs src/msgpack/write_sizer.rs src/subinvoke.rs
+
+/home/nubian/pentangeli/Work/polywrap/monorepo/packages/wasm/rs/target/debug/deps/libpolywrap_wasm_rs.so: src/lib.rs src/abort.rs src/invoke.rs src/memory.rs src/msgpack/mod.rs src/msgpack/context.rs src/msgpack/data_view.rs src/msgpack/format.rs src/msgpack/read.rs src/msgpack/read_decoder.rs src/msgpack/utils.rs src/msgpack/write.rs src/msgpack/write_encoder.rs src/msgpack/write_sizer.rs src/subinvoke.rs
+
+/home/nubian/pentangeli/Work/polywrap/monorepo/packages/wasm/rs/target/debug/deps/polywrap_wasm_rs.d: src/lib.rs src/abort.rs src/invoke.rs src/memory.rs src/msgpack/mod.rs src/msgpack/context.rs src/msgpack/data_view.rs src/msgpack/format.rs src/msgpack/read.rs src/msgpack/read_decoder.rs src/msgpack/utils.rs src/msgpack/write.rs src/msgpack/write_encoder.rs src/msgpack/write_sizer.rs src/subinvoke.rs
+
+src/lib.rs:
+src/abort.rs:
+src/invoke.rs:
+src/memory.rs:
+src/msgpack/mod.rs:
+src/msgpack/context.rs:
+src/msgpack/data_view.rs:
+src/msgpack/format.rs:
+src/msgpack/read.rs:
+src/msgpack/read_decoder.rs:
+src/msgpack/utils.rs:
+src/msgpack/write.rs:
+src/msgpack/write_encoder.rs:
+src/msgpack/write_sizer.rs:
+src/subinvoke.rs:

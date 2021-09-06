@@ -15,13 +15,11 @@ impl Api {
     /// @param options: Options for this invocation.
     /// @param client: The client instance requesting this invocation.
     /// This client will be used for any sub-queries that occur.
-    /// TODO: Use Futures
     pub async fn invoke<T>(_options: InvokeApiOptions<T>, _client: Client) -> InvokeApiResult<T> {
         unimplemented!()
     }
 
     /// Get the API's schema
-    /// TODO: Use Futures
     pub async fn get_schema(_client: Client) -> String {
         unimplemented!()
     }
