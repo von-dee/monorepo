@@ -87,7 +87,7 @@ impl Uri {
 
         // Extract the authority & path
         let mut result = String::from("");
-        let re = Regex::new(r"w3://([a-z][a-z0-9-_]+)/(.*)")
+        let re = Regex::new(r"/w3://([a-z][a-z0-9-_]+)/(.*)/")
             .unwrap()
             .find(&processed);
 
