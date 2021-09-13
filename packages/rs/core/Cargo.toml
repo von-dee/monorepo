@@ -3,6 +3,8 @@ name = "polywrap-core-rs"
 version = "0.1.0"
 description = "Core Polywrap Rust Package"
 authors = ["Kobby Pentangeli <kobbypentangeli@gmail.com>"]
+homepage = "https://polywrap.io"
+documentation = "https://docs.polywrap.io"
 repository = "https://github.com/polywrap/monorepo"
 license = "MIT"
 edition = "2018"
@@ -19,3 +21,11 @@ valico = "3.6.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+overflow-checks = true
+# Tell `rustc` to optimize for small code size.
+opt-level = "z"
+debug = false
