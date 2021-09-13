@@ -1,16 +1,22 @@
 use super::Uri;
 
-#[derive(Clone)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct UriRedirect {
     pub from: Option<Uri>,
     pub to: Option<Uri>,
 }
 
-pub fn sanitize_uri_redirects(input: &[UriRedirect]) -> Result<Vec<UriRedirect>, &str> {
+#[derive(Clone, Default, Debug, PartialEq)]
+pub struct UriRedirectArgs {
+    pub from: String,
+    pub to: String,
+}
+
+pub fn sanitize_uri_redirects(input: &[UriRedirectArgs]) -> Result<Vec<UriRedirect>, &str> {
     let mut output: Vec<UriRedirect> = vec![];
     for definition in input {
-        let from = Uri::new(&definition.from.as_ref().unwrap().get_uri().unwrap());
-        let to = Uri::new(&definition.to.as_ref().unwrap().get_uri().unwrap());
+        let from = Uri::new(&definition.from);
+        let to = Uri::new(&definition.to);
         output.push(UriRedirect {
             from: Some(from),
             to: Some(to),
