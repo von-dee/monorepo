@@ -21,7 +21,10 @@ impl Query {
     ) -> InvokeApiResult<MaybeUriOrManifest> {
         let mut input: HashMap<String, Vec<u8>> = HashMap::new();
         input
-            .insert(uri.get_authority(), uri.get_path().as_bytes().to_vec())
+            .insert(
+                uri.get_authority().unwrap(),
+                uri.get_path().unwrap().as_bytes().to_vec(),
+            )
             .expect("Error in inserting options");
         let options = InvokeApiOptions::<MaybeUriOrManifest> {
             uri: api,
@@ -40,7 +43,7 @@ impl Query {
     pub async fn get_file(mut client: Client, api: Uri, path: String) -> InvokeApiResult<Vec<u8>> {
         let mut input: HashMap<String, Vec<u8>> = HashMap::new();
         input
-            .insert(path, api.get_path().as_bytes().to_vec())
+            .insert(path, api.get_path().unwrap().as_bytes().to_vec())
             .expect("Error in inserting options");
         let options = InvokeApiOptions::<Vec<u8>> {
             uri: api,

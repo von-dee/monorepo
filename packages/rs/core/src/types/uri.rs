@@ -2,6 +2,7 @@
 
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::string::ToString;
 
 /// URI configuration
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -33,33 +34,33 @@ impl Uri {
         }
     }
 
-    pub fn get_authority(&self) -> String {
-        self.config.authority.as_ref().unwrap().to_string()
+    pub fn get_authority(&self) -> Option<String> {
+        self.config.authority.clone()
     }
 
-    pub fn get_path(&self) -> String {
-        self.config.path.as_ref().unwrap().to_string()
+    pub fn get_path(&self) -> Option<String> {
+        self.config.path.clone()
     }
 
-    pub fn get_uri(&self) -> String {
-        self.config.uri.as_ref().unwrap().to_string()
+    pub fn get_uri(&self) -> Option<String> {
+        self.config.uri.clone()
     }
 
     pub fn equals(a: &Self, b: &Self) -> bool {
         a.config.uri == b.config.uri
     }
 
-    // This function may not be necessary in Rust
-    pub fn is_uri<T>(_value: T) -> bool {
-        todo!()
+    pub fn is_uri<T: ToString>(value: T) -> bool {
+        let val_str = value.to_string();
+        let re = Regex::new(r"/([a-z][a-z0-9-_]+)://([a-z][a-z0-9-_]+)/(.*)/")
+            .unwrap()
+            .find(&val_str);
+        !val_str.is_empty() && re.is_some()
     }
 
-    pub fn is_valid_uri(uri: &str, parsed: Option<UriConfig>) -> bool {
-        if let Ok(result) = Uri::parse_uri(uri) {
-            parsed.unwrap() == result
-        } else {
-            false
-        }
+    pub fn is_valid_uri(uri: &str) -> bool {
+        let uri_config = Uri::parse_uri(uri).expect("Failed to parse URI");
+        uri_config.authority.is_some() && uri_config.path.is_some() && uri_config.uri.is_some()
     }
 
     pub fn parse_uri(uri: &str) -> Result<UriConfig, String> {
@@ -69,7 +70,6 @@ impl Uri {
         let mut processed = uri.to_string();
 
         // Trim preceding '/' characters
-        // Why are we using a `while` loop here?
         while processed.starts_with('/') {
             processed = processed.chars().nth(1).unwrap().to_string();
         }

@@ -11,7 +11,7 @@ pub fn sanitize_plugin_registrations(
 ) -> Result<Vec<PluginRegistration>, &str> {
     let mut output: Vec<PluginRegistration> = vec![];
     for definition in input {
-        let uri = Uri::new(&definition.uri.get_uri());
+        let uri = Uri::new(&definition.uri.get_uri().unwrap());
         let plugin = definition.plugin.clone();
         output.push(PluginRegistration { uri, plugin });
     }

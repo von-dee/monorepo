@@ -8,30 +8,33 @@ pub fn apply_redirects(uri: &Uri, redirects: &[UriRedirect]) -> Result<Uri, Stri
         if redirect.from.is_none() {
             let msg = format!(
                 "Redirect missing the from property.\nEncountered while resolving {}",
-                uri.get_uri()
+                uri.get_uri().unwrap()
             );
             return Err(throw_error(msg, &redirect_from_to_map));
         }
         if redirect_from_to_map
-            .get(&redirect.from.as_ref().unwrap().get_uri())
+            .get(&redirect.from.as_ref().unwrap().get_uri().unwrap())
             .is_some()
         {
             continue;
         }
         let _ = redirect_from_to_map.insert(
-            redirect.from.as_ref().unwrap().get_uri(),
+            redirect.from.as_ref().unwrap().get_uri().unwrap(),
             redirect.to.clone().unwrap(),
         );
     }
     let mut final_uri = uri.clone();
     let mut visited_uris: HashMap<String, bool> = HashMap::new();
-    while redirect_from_to_map.get(&final_uri.get_uri()).is_some() {
-        let _ = visited_uris.insert(final_uri.get_uri(), true);
+    while redirect_from_to_map
+        .get(&final_uri.get_uri().unwrap())
+        .is_some()
+    {
+        let _ = visited_uris.insert(final_uri.get_uri().unwrap(), true);
         final_uri = redirect_from_to_map
-            .get(&final_uri.get_uri())
+            .get(&final_uri.get_uri().unwrap())
             .unwrap()
             .clone();
-        if *visited_uris.get(&final_uri.get_uri()).unwrap() {
+        if *visited_uris.get(&final_uri.get_uri().unwrap()).unwrap() {
             let msg = format!("Infinite loop while resolving URI {}.", uri.to_string());
             return Err(throw_error(msg, &redirect_from_to_map));
         }
