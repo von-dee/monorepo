@@ -34,7 +34,7 @@ pub trait Plugin: Clone {
 }
 
 /// The plugin package's manifest
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct PluginPackageManifest {
     /// The API's schema
     pub schema: String,
@@ -42,7 +42,7 @@ pub struct PluginPackageManifest {
     pub implements: Vec<Uri>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct PluginPackage {
     pub factory: Client,
     pub manifest: PluginPackageManifest,
