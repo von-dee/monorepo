@@ -1,4 +1,5 @@
 pub mod migrate;
+pub mod migrators;
 pub mod prealpha_001_1;
 pub mod prealpha_001_2;
 pub mod prealpha_001_3;
@@ -12,11 +13,11 @@ pub use prealpha_001_4::Web3ApiManifest as Web3ApiManifest001Prealpha4;
 pub use prealpha_001_5::Web3ApiManifest as Web3ApiManifest001Prealpha5;
 
 pub enum Web3ApiManifestFormats {
-    Prealpha001_1(&str) = "0.0.1-prealpha.1",
-    Prealpha001_2(&str) = "0.0.1-prealpha.2",
-    Prealpha001_3(&str) = "0.0.1-prealpha.3",
-    Prealpha001_4(&str) = "0.0.1-prealpha.4",
-    Prealpha001_5(&str) = "0.0.1-prealpha.5",
+    Prealpha001_1(&'static str),
+    Prealpha001_2(&'static str),
+    Prealpha001_3(&'static str),
+    Prealpha001_4(&'static str),
+    Prealpha001_5(&'static str),
 }
 
 pub enum AnyWeb3ApiManifest {

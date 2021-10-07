@@ -24,19 +24,19 @@ impl Default for Web3ApiManifest {
 }
 
 #[derive(Clone, Debug)]
-pub(crate) enum Mutation {
+pub enum Mutation {
     Schema { file: String },
     Module { language: String, file: String },
 }
 
 #[derive(Clone, Debug)]
-pub(crate) enum Query {
+pub enum Query {
     Schema { file: String },
     Module { language: String, file: String },
 }
 
 #[derive(Clone, Debug)]
-pub(crate) struct ImportRedirects {
-    pub(crate) uri: String,
-    pub(crate) schema: String,
+pub struct ImportRedirects {
+    pub uri: String,
+    pub schema: String,
 }
