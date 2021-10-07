@@ -1,3 +1,5 @@
+use super::{ImportRedirects, Module, Mutation, Query};
+
 #[derive(Clone, Debug)]
 pub struct Web3ApiManifest {
     pub format: String,
@@ -5,6 +7,7 @@ pub struct Web3ApiManifest {
     pub repository: Option<String>,
     pub mutation: Option<Mutation>,
     pub query: Option<Query>,
+    pub module: Option<Module>,
     pub import_redirects: Option<Vec<ImportRedirects>>,
     pub __type: String,
 }
@@ -17,37 +20,9 @@ impl Default for Web3ApiManifest {
             repository: None,
             mutation: None,
             query: None,
+            module: None,
             import_redirects: None,
             __type: "Web3ApiManifest".to_string(),
         }
     }
-}
-
-#[derive(Clone, Debug)]
-pub struct Mutation {
-    pub schema: Schema,
-    pub module: Module,
-}
-
-#[derive(Clone, Debug)]
-pub struct Query {
-    pub schema: Schema,
-    pub module: Module,
-}
-
-#[derive(Clone, Debug)]
-pub struct Module {
-    pub language: String,
-    pub file: String,
-}
-
-#[derive(Clone, Debug)]
-pub struct Schema {
-    pub file: String,
-}
-
-#[derive(Clone, Debug)]
-pub struct ImportRedirects {
-    pub uri: String,
-    pub schema: String,
 }

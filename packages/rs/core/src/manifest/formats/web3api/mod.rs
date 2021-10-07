@@ -32,3 +32,47 @@ pub type Web3ApiManifest = Web3ApiManifest001Prealpha5;
 
 pub const LATEST_WEB3_API_MANIFEST_FORMAT: Web3ApiManifestFormats =
     Web3ApiManifestFormats::Prealpha001_5("0.0.1-prealpha.5");
+
+#[derive(Clone, Debug)]
+pub struct Modules {
+    pub mutation: Option<Mutation>,
+    pub query: Option<Query>,
+}
+
+impl Default for Modules {
+    fn default() -> Modules {
+        Modules {
+            mutation: None,
+            query: None,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct Mutation {
+    pub schema: Schema,
+    pub module: Module,
+}
+
+#[derive(Clone, Debug)]
+pub struct Query {
+    pub schema: Schema,
+    pub module: Module,
+}
+
+#[derive(Clone, Debug)]
+pub struct Module {
+    pub language: String,
+    pub file: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct Schema {
+    pub file: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct ImportRedirects {
+    pub uri: String,
+    pub schema: String,
+}
