@@ -1,12 +1,12 @@
 #[derive(Clone, Debug)]
 pub struct Web3ApiManifest {
-    format: String,
-    description: Option<String>,
-    repository: Option<String>,
-    mutation: Option<Mutation>,
-    query: Option<Query>,
-    import_redirects: Option<Vec<ImportRedirects>>,
-    __type: String,
+    pub format: String,
+    pub description: Option<String>,
+    pub repository: Option<String>,
+    pub mutation: Option<Mutation>,
+    pub query: Option<Query>,
+    pub import_redirects: Option<Vec<ImportRedirects>>,
+    pub __type: String,
 }
 
 impl Default for Web3ApiManifest {
