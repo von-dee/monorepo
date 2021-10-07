@@ -19,7 +19,7 @@ pub fn migrate(old: &mut OldManifest) -> Result<NewManifest, &'static str> {
             mutation: old.mutation.clone(),
             query: old.query.clone(),
         },
-        import_redirects: None,
+        import_redirects: old.import_redirects.clone(),
         __type: "Web3ApiManifest".to_string(),
     })
 }
