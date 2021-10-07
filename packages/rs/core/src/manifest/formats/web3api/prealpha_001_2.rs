@@ -24,9 +24,9 @@ impl Default for Web3ApiManifest {
 }
 
 #[derive(Clone, Debug)]
-struct Modules {
-    mutation: Option<Mutation>,
-    query: Option<Query>,
+pub(crate) struct Modules {
+    pub(crate) mutation: Option<Mutation>,
+    pub(crate) query: Option<Query>,
 }
 
 impl Default for Modules {
@@ -39,19 +39,19 @@ impl Default for Modules {
 }
 
 #[derive(Clone, Debug)]
-enum Mutation {
+pub(crate) enum Mutation {
     Schema { schema: String },
     Module { module: String },
 }
 
 #[derive(Clone, Debug)]
-enum Query {
+pub(crate) enum Query {
     Schema { schema: String },
     Module { module: String },
 }
 
 #[derive(Clone, Debug)]
-struct ImportRedirects {
-    uri: String,
-    schema: String,
+pub(crate) struct ImportRedirects {
+    pub(crate) uri: String,
+    pub(crate) schema: String,
 }
