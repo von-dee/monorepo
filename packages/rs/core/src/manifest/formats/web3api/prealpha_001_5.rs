@@ -40,25 +40,25 @@ impl Default for Modules {
 
 #[derive(Clone, Debug)]
 pub struct Mutation {
-    schema: Schema,
-    module: Module,
+    pub schema: Schema,
+    pub module: Module,
 }
 
 #[derive(Clone, Debug)]
 pub struct Query {
-    schema: Schema,
-    module: Module,
+    pub schema: Schema,
+    pub module: Module,
 }
 
 #[derive(Clone, Debug)]
 pub struct Module {
-    language: String,
-    file: String,
+    pub language: String,
+    pub file: String,
 }
 
 #[derive(Clone, Debug)]
 pub struct Schema {
-    file: String,
+    pub file: String,
 }
 
 #[derive(Clone, Debug)]
