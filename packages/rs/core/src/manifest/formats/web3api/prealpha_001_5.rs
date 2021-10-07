@@ -39,19 +39,30 @@ impl Default for Modules {
 }
 
 #[derive(Clone, Debug)]
-pub enum Mutation {
-    Schema { schema: String },
-    Module { module: Option<String> },
+pub struct Mutation {
+    schema: Schema,
+    module: Module,
 }
 
 #[derive(Clone, Debug)]
-pub enum Query {
-    Schema { schema: String },
-    Module { module: Option<String> },
+pub struct Query {
+    schema: Schema,
+    module: Module,
+}
+
+#[derive(Clone, Debug)]
+pub struct Module {
+    language: String,
+    file: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct Schema {
+    file: String,
 }
 
 #[derive(Clone, Debug)]
 pub struct ImportRedirects {
-    pub(crate) uri: String,
-    pub(crate) schema: String,
+    pub uri: String,
+    pub schema: String,
 }

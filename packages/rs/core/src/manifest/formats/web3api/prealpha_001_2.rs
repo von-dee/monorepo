@@ -39,15 +39,26 @@ impl Default for Modules {
 }
 
 #[derive(Clone, Debug)]
-pub enum Mutation {
-    Schema { schema: String },
-    Module { module: String },
+pub struct Mutation {
+    schema: Schema,
+    module: Module,
 }
 
 #[derive(Clone, Debug)]
-pub enum Query {
-    Schema { schema: String },
-    Module { module: String },
+pub struct Query {
+    schema: Schema,
+    module: Module,
+}
+
+#[derive(Clone, Debug)]
+pub struct Module {
+    language: String,
+    file: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct Schema {
+    file: String,
 }
 
 #[derive(Clone, Debug)]

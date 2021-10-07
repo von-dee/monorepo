@@ -24,15 +24,26 @@ impl Default for Web3ApiManifest {
 }
 
 #[derive(Clone, Debug)]
-pub enum Mutation {
-    Schema { file: String },
-    Module { language: String, file: String },
+pub struct Mutation {
+    schema: Schema,
+    module: Module,
 }
 
 #[derive(Clone, Debug)]
-pub enum Query {
-    Schema { file: String },
-    Module { language: String, file: String },
+pub struct Query {
+    schema: Schema,
+    module: Module,
+}
+
+#[derive(Clone, Debug)]
+pub struct Module {
+    language: String,
+    file: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct Schema {
+    file: String,
 }
 
 #[derive(Clone, Debug)]
