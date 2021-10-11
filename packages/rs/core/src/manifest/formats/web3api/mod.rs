@@ -17,6 +17,7 @@ pub type Web3ApiManifest = Web3ApiManifest001Prealpha5;
 pub const LATEST_WEB3_API_MANIFEST_FORMAT: Web3ApiManifestFormats =
     Web3ApiManifestFormats::Prealpha001_5("0.0.1-prealpha.5");
 
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Web3ApiManifestFormats {
     Prealpha001_1(&'static str),
     Prealpha001_2(&'static str),
@@ -26,11 +27,19 @@ pub enum Web3ApiManifestFormats {
 }
 
 pub struct AnyWeb3ApiManifest {
-    pub web3_api_manifest_001_prealpha1: Web3ApiManifest001Prealpha1,
-    pub web3_api_manifest_001_prealpha2: Web3ApiManifest001Prealpha2,
-    pub web3_api_manifest_001_prealpha3: Web3ApiManifest001Prealpha3,
-    pub web3_api_manifest_001_prealpha4: Web3ApiManifest001Prealpha4,
-    pub web3_api_manifest_001_prealpha5: Web3ApiManifest001Prealpha5,
+    pub __type: String,
+    pub format: Web3ApiManifestFormats,
+    pub language: String,
+    pub interface: bool,
+    pub description: Option<String>,
+    pub repository: Option<String>,
+    pub mutation: Option<Mutation>,
+    pub query: Option<Query>,
+    pub module: Option<Module>,
+    pub build: Option<String>,
+    pub meta: Option<String>,
+    pub modules: Option<Modules>,
+    pub import_redirects: Option<Vec<ImportRedirects>>,
 }
 
 #[derive(Clone, Debug)]
