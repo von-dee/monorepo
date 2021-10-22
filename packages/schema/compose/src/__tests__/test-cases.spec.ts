@@ -1,4 +1,4 @@
-import { composeSchema } from "../";
+import { composeSchema } from "composeSchema";
 import { fetchTestCases } from "./index";
 
 function removeFunctionProps(obj: unknown) {
