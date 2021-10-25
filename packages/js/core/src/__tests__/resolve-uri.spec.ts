@@ -13,6 +13,8 @@ import {
   Uri,
   UriRedirect,
   resolveUri,
+  CancelablePromise,
+  Subscription,
 } from "../";
 import { coreInterfaceUris } from "../interfaces";
 import { InterfaceImplementations, PluginRegistration } from "../types";
@@ -24,8 +26,8 @@ describe("resolveUri", () => {
     query: <
       TData extends Record<string, unknown> = Record<string, unknown>,
       TVariables extends Record<string, unknown> = Record<string, unknown>,
-    >(_options: QueryApiOptions<TVariables, string | Uri>): Promise<QueryApiResult<TData>> => {
-      return Promise.resolve({
+    >(_options: QueryApiOptions<TVariables, string | Uri>): CancelablePromise<QueryApiResult<TData>> => {
+      return CancelablePromise.resolve({
         data: ({
           foo: "foo",
         } as Record<string, unknown>) as TData
@@ -33,42 +35,73 @@ describe("resolveUri", () => {
     },
     invoke: <TData = unknown>(
       options: InvokeApiOptions<string | Uri>
-    ): Promise<InvokeApiResult<TData>> => {
+    ): CancelablePromise<InvokeApiResult<TData>> => {
       let uri = options.uri;
       if (Uri.isUri(uri)) {
         uri = uri.uri;
       }
-      return Promise.resolve({
+      return CancelablePromise.resolve({
         data: apis[uri]?.[options.module]?.[options.method](
           options.input as Record<string, unknown>,
           {} as Client
         ) as TData,
       });
     },
+    getSchema: () => {
+      return Promise.resolve("schema");
+    },
+    getFile: () => {
+      return Promise.resolve("file");
+    },
+    getManifest: () => {
+      return Promise.resolve({} as any);
+    },
+    getImplementations: () => {
+      return [];
+    },
+    subscribe: () => {
+      return {} as Subscription<any>;
+    }
   });
 
   const createPluginApi = (uri: Uri, plugin: PluginPackage): Api => {
     return {
-      invoke: () =>
-        Promise.resolve({
+      invoke: () => {
+        return CancelablePromise.resolve({
           uri,
           plugin,
-        } as InvokeApiResult),
-        getSchema: (_client: Client): Promise<string> =>
-          Promise.resolve("")
+        } as InvokeApiResult);
+      },
+      getSchema: (_client: Client): Promise<string> => {
+        return Promise.resolve("");
+      },
+      getFile: () => {
+        return Promise.resolve("file");
+      },
+      getManifest: () => {
+        return Promise.resolve({} as any);
+      },
     };
   };
 
   const createApi = (uri: Uri, manifest: Web3ApiManifest, uriResolver: Uri): Api => {
     return {
-      invoke: () =>
-        Promise.resolve({
+      invoke: () => {
+        return CancelablePromise.resolve({
           uri,
           manifest,
           uriResolver,
-        } as InvokeApiResult),
-      getSchema: (_client: Client): Promise<string> =>
-        Promise.resolve("")
+        } as InvokeApiResult);
+      },
+      getSchema: (_client: Client): Promise<string> => {
+        return Promise.resolve("");
+      },
+      getFile: () => {
+        return Promise.resolve("file");
+      },
+      getManifest: () => {
+        return Promise.resolve({} as any);
+      },
     };
   };
 
@@ -167,7 +200,7 @@ describe("resolveUri", () => {
     );
 
     const apiIdentity = await result.invoke(
-      {} as InvokeApiOptions,
+      {} as InvokeApiOptions<Uri>,
       {} as Client
     );
 
@@ -193,7 +226,7 @@ describe("resolveUri", () => {
     );
 
     const apiIdentity = await result.invoke(
-      {} as InvokeApiOptions,
+      {} as InvokeApiOptions<Uri>,
       {} as Client
     );
 
@@ -219,7 +252,7 @@ describe("resolveUri", () => {
     );
 
     const apiIdentity = await result.invoke(
-      {} as InvokeApiOptions,
+      {} as InvokeApiOptions<Uri>,
       {} as Client
     );
 
@@ -246,7 +279,7 @@ describe("resolveUri", () => {
     );
 
     const apiIdentity = await result.invoke(
-      {} as InvokeApiOptions,
+      {} as InvokeApiOptions<Uri>,
       {} as Client
     );
 
@@ -342,7 +375,7 @@ describe("resolveUri", () => {
     );
 
     const apiIdentity = await result.invoke(
-      {} as InvokeApiOptions,
+      {} as InvokeApiOptions<Uri>,
       {} as Client
     );
 

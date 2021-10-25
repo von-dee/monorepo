@@ -1,4 +1,8 @@
-import { Uri, InvokeApiOptions } from "./";
+import {
+  Uri,
+  InvokeApiOptions,
+  CancelablePromise,
+} from "./";
 
 import { Tracer } from "@web3api/tracing-js";
 import { DocumentNode } from "graphql";
@@ -72,5 +76,5 @@ export interface QueryHandler {
     TUri extends Uri | string = string
   >(
     options: QueryApiOptions<TVariables, TUri>
-  ): Promise<QueryApiResult<TData>>;
+  ): CancelablePromise<QueryApiResult<TData>>;
 }

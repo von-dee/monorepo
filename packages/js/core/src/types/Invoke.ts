@@ -1,4 +1,7 @@
-import { Uri } from ".";
+import {
+  Uri,
+  CancelablePromise,
+} from ".";
 
 export type InvokableModules = "query" | "mutation";
 
@@ -55,5 +58,5 @@ export interface InvokeApiResult<TData = unknown> {
 export interface InvokeHandler {
   invoke<TData = unknown, TUri extends Uri | string = string>(
     options: InvokeApiOptions<TUri>
-  ): Promise<InvokeApiResult<TData>>;
+  ): CancelablePromise<InvokeApiResult<TData>>;
 }

@@ -1,0 +1,13 @@
+- invoke cancel
+- query cancel
+- subscription cancel
+
+Test:
+- Wasm module
+- - sleep 200
+- - plugin call -> console log "running"
+- - call self
+- query wasm circular wasm module
+- wait for "running" 5 times
+- cancel query
+- wait 500ms and ensure nothing new is logged

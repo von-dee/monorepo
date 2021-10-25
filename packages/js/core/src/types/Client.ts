@@ -18,7 +18,10 @@ export interface Client
   extends QueryHandler,
     SubscriptionHandler,
     InvokeHandler {
-  getSchema<TUri extends Uri | string>(uri: TUri): Promise<string>;
+
+  getSchema<TUri extends Uri | string>(
+    uri: TUri
+  ): Promise<string>;
 
   getManifest<TUri extends Uri | string, TManifestType extends ManifestType>(
     uri: TUri,

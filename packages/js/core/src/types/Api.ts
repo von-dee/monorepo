@@ -5,6 +5,7 @@ import {
   GetManifestOptions,
   InvokeApiOptions,
   InvokeApiResult,
+  CancelablePromise,
 } from ".";
 import { AnyManifest, ManifestType } from "../manifest";
 
@@ -14,7 +15,7 @@ import { AnyManifest, ManifestType } from "../manifest";
  * this class may do things like caching WASM bytecode, spawning
  * worker threads, or indexing into resolvers to find the requested method.
  */
-export abstract class Api {
+export interface Api {
   /**
    * Invoke the API based on the provided [[InvokeApiOptions]]
    *
@@ -22,17 +23,17 @@ export abstract class Api {
    * @param client The client instance requesting this invocation.
    * This client will be used for any sub-queries that occur.
    */
-  public abstract async invoke(
+   invoke(
     options: InvokeApiOptions<Uri>,
     client: Client
-  ): Promise<InvokeApiResult<unknown>>;
+  ): CancelablePromise<InvokeApiResult<unknown>>;
 
   /**
    * Get the API's schema
    *
    * @param client The client instance the schema.
    */
-  public abstract async getSchema(client: Client): Promise<string>;
+  getSchema(client: Client): Promise<string>;
 
   /**
    * Get the API's manifest
@@ -40,7 +41,7 @@ export abstract class Api {
    * @param options Configuration options for manifest retrieval
    * @param client The client instance requesting the manifest.
    */
-  public abstract async getManifest<TManifestType extends ManifestType>(
+  getManifest<TManifestType extends ManifestType>(
     options: GetManifestOptions<TManifestType>,
     client: Client
   ): Promise<AnyManifest<TManifestType>>;
@@ -52,7 +53,7 @@ export abstract class Api {
    * @param options Configuration options for file retrieval
    * @param client The client instance requesting the file.
    */
-  public abstract async getFile(
+  getFile(
     options: GetFileOptions,
     client: Client
   ): Promise<ArrayBuffer | string>;
