@@ -60,14 +60,16 @@ describe("CancelablePromise", () => {
 
   it("calls onCancel", async () => {
     let result = false;
-    let onCancel = "foo";
+    let cancelValue = "foo";
     const promise = new CancelablePromise<boolean>(
-      (resolve) => {
+      (resolve, reject, onCancel) => {
+        onCancel(
+          () => cancelValue = "bar"
+        );
         setTimeout(() => {
           resolve(true);
         }, 200);
       },
-      () => onCancel = "bar"
     );
     promise.then((value) => result = value);
     promise.cancel();
@@ -79,6 +81,70 @@ describe("CancelablePromise", () => {
     });
 
     expect(result).toBe(false);
-    expect(onCancel).toBe("bar");
+    expect(cancelValue).toBe("bar");
+  });
+
+  it("Promise.all and Promise.race work", async () => {
+    const createPromises = () => {
+      return {
+        promiseA: new CancelablePromise<string>(
+          (resolve) => {
+            setTimeout(() => {
+              resolve("A");
+            }, 200);
+          }
+        ),
+        promiseB: new CancelablePromise<string>(
+          (resolve) => {
+            setTimeout(() => {
+              resolve("B");
+            }, 400);
+          }
+        )
+      };
+    };
+
+    const race = createPromises();
+    race.promiseA.cancel();
+
+    const raceResult = await Promise.race([
+      race.promiseA,
+      race.promiseB
+    ]);
+
+    expect(raceResult).toBe("B");
+
+    const all = createPromises();
+    const allResult = await Promise.all([
+      all.promiseA,
+      all.promiseB
+    ]);
+
+    expect(allResult[0]).toBe("A");
+    expect(allResult[1]).toBe("B");
+  });
+
+  it("doesn't execute sub-promises after cancel", async () => {
+    const results: string[] = [];
+    const sleep = (ms: number) => new CancelablePromise<void>((resolve) =>
+      setTimeout(() => resolve(), ms)
+    );
+
+    const promise = sleep(200)
+      .then(() => results.push("first"))
+      .then(() => sleep(200))
+      .then(() => results.push("second"))
+      .then(() => sleep(200))
+      .then(() => results.push("third"))
+      .then(() => sleep(200))
+      .then(() => results.push("fourth"));
+
+    await sleep(300);
+    promise.cancel();
+
+    await sleep(1000);
+
+    expect(results.length).toBe(1);
+    expect(results[0]).toBe("first");
   });
 });
