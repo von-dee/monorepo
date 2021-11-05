@@ -6,6 +6,7 @@ import {
   Api,
   ApiCache,
   Client,
+  CancelablePromise,
   InvokeApiOptions,
   InvokeApiResult,
   PluginPackage,
@@ -130,7 +131,7 @@ export class Web3ApiClient implements Client {
     TUri extends Uri | string = string
   >(
     options: QueryApiOptions<TVariables, TUri>
-  ): Promise<QueryApiResult<TData>> {
+  ): CancelablePromise<QueryApiResult<TData>> {
     const typedOptions: QueryApiOptions<TVariables, Uri> = {
       ...options,
       uri: this._toUri(options.uri),
@@ -203,7 +204,7 @@ export class Web3ApiClient implements Client {
 
   public async invoke<TData = unknown, TUri extends Uri | string = string>(
     options: InvokeApiOptions<TUri>
-  ): Promise<InvokeApiResult<TData>> {
+  ): CancelablePromise<InvokeApiResult<TData>> {
     const typedOptions: InvokeApiOptions<Uri> = {
       ...options,
       uri: this._toUri(options.uri),

@@ -19,14 +19,16 @@ import {
   ManifestType,
   combinePaths,
   GetFileOptions,
+  CancelablePromise,
 } from "@web3api/core-js";
 import * as MsgPack from "@msgpack/msgpack";
 import { Tracer } from "@web3api/tracing-js";
 import { AsyncWasmInstance } from "@web3api/asyncify-js";
 
 type InvokeResult =
-  | { type: "InvokeResult"; invokeResult: ArrayBuffer }
-  | { type: "InvokeError"; invokeError: string };
+  | { type: "InvokeResult"; invokeResult: ArrayBuffer; }
+  | { type: "InvokeError"; invokeError: string; }
+  | { type: "InvokeCanceled"; reason: string; };
 
 export interface State {
   method: string;
@@ -34,11 +36,13 @@ export interface State {
   invoke: {
     result?: ArrayBuffer;
     error?: string;
+    canceled?: boolean;
   };
   subinvoke: {
     result?: ArrayBuffer;
     error?: string;
     args: unknown[];
+    cancel?: () => void;
   };
   invokeResult: InvokeResult;
 }
@@ -72,15 +76,14 @@ export class WasmWeb3Api extends Api {
   public async invoke(
     options: InvokeApiOptions<Uri>,
     client: Client
-  ): Promise<InvokeApiResult<unknown | ArrayBuffer>> {
+  ): CancelablePromise<InvokeApiResult<unknown | ArrayBuffer>> {
     const run = Tracer.traceFunc(
       "WasmWeb3Api: invoke",
       async (
         options: InvokeApiOptions<Uri>,
         client: Client
-      ): Promise<InvokeApiResult<unknown | ArrayBuffer>> => {
+      ): CancelablePromise<InvokeApiResult<unknown | ArrayBuffer>> => {
         const { module: invokableModule, method, input, decode } = options;
-        const wasm = await this._getWasmModule(invokableModule, client);
         const state: State = {
           invoke: {},
           subinvoke: {
@@ -102,67 +105,89 @@ export class WasmWeb3Api extends Api {
           );
         };
 
-        const memory = new WebAssembly.Memory({ initial: 1 });
-        const instance = await AsyncWasmInstance.createInstance({
-          module: wasm,
-          imports: createImports({
-            state,
-            client,
-            memory,
-            abort,
-          }),
-          requiredExports: WasmWeb3Api.requiredExports,
-        });
+        const onCancel = () => {
+          state.invoke.canceled = true;
+          state.subinvoke.cancel && state.subinvoke.cancel();
+        };
 
-        const exports = instance.exports as W3Exports;
+        return new CancelablePromise(async (resolve, reject) => {
+          const memory = new WebAssembly.Memory({ initial: 1 });
+          const wasm = await this._getWasmModule(invokableModule, client);
+          const instance = await AsyncWasmInstance.createInstance({
+            module: wasm,
+            imports: createImports({
+              state,
+              client,
+              memory,
+              abort,
+            }),
+            requiredExports: WasmWeb3Api.requiredExports,
+          });
 
-        const result = await exports._w3_invoke(
-          state.method.length,
-          state.args.byteLength
-        );
+          const exports = instance.exports as W3Exports;
 
-        const invokeResult = this._processInvokeResult(state, result, abort);
+          const result = await exports._w3_invoke(
+            state.method.length,
+            state.args.byteLength
+          );
 
-        switch (invokeResult.type) {
-          case "InvokeError": {
-            throw Error(
-              `WasmWeb3Api: invocation exception encountered.\n` +
-                `uri: ${this._uri.uri}\nmodule: ${invokableModule}\n` +
-                `method: ${method}\n` +
-                `input: ${JSON.stringify(input, null, 2)}\n` +
-                `exception: ${invokeResult.invokeError}`
-            );
-          }
-          case "InvokeResult": {
-            if (decode) {
-              try {
-                return {
-                  data: MsgPack.decode(
-                    invokeResult.invokeResult as ArrayBuffer
-                  ),
-                };
-              } catch (err) {
-                throw Error(
-                  `WasmWeb3Api: Failed to decode query result.\nResult: ${JSON.stringify(
-                    invokeResult.invokeResult
-                  )}\nError: ${err}`
-                );
+          const invokeResult = this._processInvokeResult(state, result, abort);
+
+          switch (invokeResult.type) {
+            case "InvokeError": {
+              reject(
+                Error(`WasmWeb3Api: invocation exception encountered.\n` +
+                  `uri: ${this._uri.uri}\nmodule: ${invokableModule}\n` +
+                  `method: ${method}\n` +
+                  `input: ${JSON.stringify(input, null, 2)}\n` +
+                  `exception: ${invokeResult.invokeError}`
+                )
+              );
+              return;
+            }
+            case "InvokeResult": {
+              if (decode) {
+                try {
+                  resolve({
+                    data: MsgPack.decode(
+                      invokeResult.invokeResult as ArrayBuffer
+                    ),
+                  });
+                  return;
+                } catch (err) {
+                  reject(
+                    Error(`WasmWeb3Api: Failed to decode query result.\nResult: ${JSON.stringify(
+                        invokeResult.invokeResult
+                      )}\nError: ${err}`
+                    )
+                  );
+                  return;
+                }
+              } else {
+                resolve({
+                  data: invokeResult.invokeResult
+                });
+                return;
               }
-            } else {
-              return { data: invokeResult.invokeResult };
+            }
+            case "InvokeCanceled": {
+              // TODO: this + add "reason" to cancelable promise
+            }
+            default: {
+              reject(
+                Error(`WasmWeb3Api: Unknown state "${state}"`)
+              );
+              return;
             }
           }
-          default: {
-            throw Error(`WasmWeb3Api: Unknown state "${state}"`);
-          }
-        }
+        }, onCancel);
       }
     );
 
     return run(options, client).catch((error: Error) => {
-      return {
+      return CancelablePromise.resolve({
         error,
-      };
+      });
     });
   }
 

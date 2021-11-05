@@ -7,6 +7,10 @@ import { State } from "./WasmWeb3Api";
 
 import * as MsgPack from "@msgpack/msgpack";
 
+// TODO:
+// - if state.canceled, return error
+// - onCancel -> call client.invoke.cancel inside subinvoke
+
 export const createImports = (config: {
   client: Client;
   memory: WebAssembly.Memory;

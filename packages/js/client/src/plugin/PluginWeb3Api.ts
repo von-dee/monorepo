@@ -12,6 +12,7 @@ import {
   AnyManifest,
   ManifestType,
   GetFileOptions,
+  CancelablePromise,
 } from "@web3api/core-js";
 import * as MsgPack from "@msgpack/msgpack";
 import { Tracer } from "@web3api/tracing-js";
@@ -33,7 +34,7 @@ export class PluginWeb3Api extends Api {
   public async invoke<TData = unknown>(
     options: InvokeApiOptions<Uri>,
     client: Client
-  ): Promise<InvokeApiResult<TData>> {
+  ): CancelablePromise<InvokeApiResult<TData>> {
     const run = Tracer.traceFunc(
       "PluginWeb3Api: invoke",
       async (
