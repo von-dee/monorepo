@@ -536,29 +536,30 @@ export class Compiler {
       path.join(buildDir, `${moduleName}.wasm`)
     );
 
-    const mod = await WebAssembly.compile(wasmSource);
     const memory = new WebAssembly.Memory({ initial: 1 });
-    const w3Imports: Record<keyof W3Imports, () => void> = {
-      __w3_subinvoke: () => {},
-      __w3_subinvoke_result_len: () => {},
-      __w3_subinvoke_result: () => {},
-      __w3_subinvoke_error_len: () => {},
-      __w3_subinvoke_error: () => {},
-      __w3_invoke_args: () => {},
-      __w3_invoke_result: () => {},
-      __w3_invoke_error: () => {},
-      __w3_getImplementations: () => {},
-      __w3_getImplementations_result_len: () => {},
-      __w3_getImplementations_result: () => {},
-      __w3_abort: () => {},
-    };
-
-    const instance = await WebAssembly.instantiate(mod, {
+    const w3Imports: W3Imports = {
+      w3: {
+        __w3_subinvoke: () => Promise.resolve(true),
+        __w3_subinvoke_result_len: () => 0,
+        __w3_subinvoke_result: () => {},
+        __w3_subinvoke_error_len: () => 0,
+        __w3_subinvoke_error: () => {},
+        __w3_invoke_args: () => {},
+        __w3_invoke_result: () => {},
+        __w3_invoke_error: () => {},
+        __w3_getImplementations: () => true,
+        __w3_getImplementations_result_len: () => 0,
+        __w3_getImplementations_result: () => {},
+        __w3_abort: () => {},
+      },
       env: {
         memory,
       },
-      w3: w3Imports,
-    });
+    };
+
+    const instance = (
+      await WebAssembly.instantiate(wasmSource, w3Imports)
+    ).instance;
 
     const requiredExports = [
       ...WasmWeb3Api.requiredExports,
