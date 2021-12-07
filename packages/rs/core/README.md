@@ -1,3 +1,3 @@
-# Polywrap Rust Core
+# Polywrap Rust Core Package
 
 TODO

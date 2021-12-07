@@ -14,32 +14,53 @@ pub use prealpha_001_5::Web3ApiManifest as Web3ApiManifest001Prealpha5;
 
 pub type Web3ApiManifest = Web3ApiManifest001Prealpha5;
 
-pub const LATEST_WEB3_API_MANIFEST_FORMAT: Web3ApiManifestFormats =
-    Web3ApiManifestFormats::Prealpha001_5("0.0.1-prealpha.5");
+pub const LATEST_WEB3_API_MANIFEST_FORMAT: &'static str = Web3ApiManifestFormats::PREALPHA_001_5;
 
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub enum Web3ApiManifestFormats {
-    Prealpha001_1(&'static str),
-    Prealpha001_2(&'static str),
-    Prealpha001_3(&'static str),
-    Prealpha001_4(&'static str),
-    Prealpha001_5(&'static str),
+pub struct Web3ApiManifestFormats;
+
+impl Web3ApiManifestFormats {
+    pub const PREALPHA_001_1: &'static str = "0.0.1-prealpha.1";
+    pub const PREALPHA_001_2: &'static str = "0.0.1-prealpha.2";
+    pub const PREALPHA_001_3: &'static str = "0.0.1-prealpha.3";
+    pub const PREALPHA_001_4: &'static str = "0.0.1-prealpha.4";
+    pub const PREALPHA_001_5: &'static str = "0.0.1-prealpha.5";
+
+    pub fn get_format_name(input: &str) -> Option<&str> {
+        let format = match input {
+            Web3ApiManifestFormats::PREALPHA_001_1 => Web3ApiManifestFormats::PREALPHA_001_1,
+            Web3ApiManifestFormats::PREALPHA_001_2 => Web3ApiManifestFormats::PREALPHA_001_2,
+            Web3ApiManifestFormats::PREALPHA_001_3 => Web3ApiManifestFormats::PREALPHA_001_3,
+            Web3ApiManifestFormats::PREALPHA_001_4 => Web3ApiManifestFormats::PREALPHA_001_4,
+            Web3ApiManifestFormats::PREALPHA_001_5 => Web3ApiManifestFormats::PREALPHA_001_5,
+            _ => "",
+        };
+        if format.is_empty() {
+            return None;
+        }
+        Some(format)
+    }
 }
 
-pub struct AnyWeb3ApiManifest {
-    pub __type: String,
-    pub format: Web3ApiManifestFormats,
-    pub language: String,
-    pub interface: bool,
-    pub description: Option<String>,
-    pub repository: Option<String>,
-    pub mutation: Option<Mutation>,
-    pub query: Option<Query>,
-    pub module: Option<Module>,
-    pub build: Option<String>,
-    pub meta: Option<String>,
-    pub modules: Option<Modules>,
-    pub import_redirects: Option<Vec<ImportRedirects>>,
+pub enum AnyWeb3ApiManifest {
+    Web3ApiManifest001Prealpha1(Web3ApiManifest001Prealpha1),
+    Web3ApiManifest001Prealpha2(Web3ApiManifest001Prealpha2),
+    Web3ApiManifest001Prealpha3(Web3ApiManifest001Prealpha3),
+    Web3ApiManifest001Prealpha4(Web3ApiManifest001Prealpha4),
+    Web3ApiManifest001Prealpha5(Web3ApiManifest001Prealpha5),
+}
+
+impl AnyWeb3ApiManifest {
+    pub fn get_manifest_format(manifest: &mut Self) -> &String {
+        match manifest {
+            AnyWeb3ApiManifest::Web3ApiManifest001Prealpha1(one) => &one.format,
+            AnyWeb3ApiManifest::Web3ApiManifest001Prealpha2(two) => &two.format,
+            AnyWeb3ApiManifest::Web3ApiManifest001Prealpha3(three) => &three.format,
+            AnyWeb3ApiManifest::Web3ApiManifest001Prealpha4(four) => &four.format,
+            AnyWeb3ApiManifest::Web3ApiManifest001Prealpha5(five) => &five.format,
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
