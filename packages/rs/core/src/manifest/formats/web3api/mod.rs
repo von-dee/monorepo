@@ -1,3 +1,4 @@
+pub mod deserialize;
 pub mod migrate;
 pub mod migrators;
 pub mod prealpha_001_1;
@@ -5,7 +6,9 @@ pub mod prealpha_001_2;
 pub mod prealpha_001_3;
 pub mod prealpha_001_4;
 pub mod prealpha_001_5;
+pub mod validate;
 
+pub use migrate::migrate_web3_api_manifest;
 pub use prealpha_001_1::Web3ApiManifest as Web3ApiManifest001Prealpha1;
 pub use prealpha_001_2::Web3ApiManifest as Web3ApiManifest001Prealpha2;
 pub use prealpha_001_3::Web3ApiManifest as Web3ApiManifest001Prealpha3;

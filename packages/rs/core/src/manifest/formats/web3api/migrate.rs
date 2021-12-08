@@ -9,9 +9,9 @@ use super::{
 };
 use std::collections::HashMap;
 
-pub type MigratorMap =
+type MigratorMap =
     HashMap<String, fn(manifest: &mut AnyWeb3ApiManifest) -> Result<Web3ApiManifest, &'static str>>;
-pub struct Migrator;
+struct Migrator;
 impl Migrator {
     pub fn generate_migrators() -> MigratorMap {
         let mut migrators: MigratorMap = HashMap::new();
