@@ -5,7 +5,7 @@ pub struct BuildManifest<T: Clone> {
     pub format: String,
     pub docker: Option<Docker>,
     pub config: Option<Config<T>>,
-    pub linked_packages: Option<LinkedPackages>,
+    pub linked_packages: Option<Vec<LinkedPackages>>,
     pub __type: String,
 }
 
