@@ -43,7 +43,7 @@ pub fn migrate_meta_manifest(
     let migrator = migrators.get(from.as_str());
     if migrator.is_none() {
         return Err(format!(
-            "This should never happen, MetaManifest migrators is empty. {} to {}",
+            "This should never happen, MetaManifest migrators is empty. from: {}, to: {}",
             &from, to
         ));
     }
