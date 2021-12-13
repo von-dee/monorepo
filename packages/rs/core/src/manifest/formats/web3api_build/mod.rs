@@ -13,7 +13,7 @@ pub use prealpha_001_1::BuildManifest as BuildManifest001Prealpha1;
 pub use prealpha_001_2::BuildManifest as BuildManifest001Prealpha2;
 pub use validate::validate_build_manifest;
 
-pub type BuildManifest<T> = BuildManifest001Prealpha2<T>;
+pub type BuildManifest = BuildManifest001Prealpha2;
 
 pub const LATEST_BUILD_MANIFEST_FORMAT: &'static str = BuildManifestFormats::PREALPHA_001_2;
 
@@ -38,13 +38,13 @@ impl BuildManifestFormats {
     }
 }
 
-#[derive(Debug, Clone)]
-pub enum AnyBuildManifest<T: Clone + std::fmt::Debug + Serialize> {
-    BuildManifest001Prealpha1(BuildManifest001Prealpha1<T>),
-    BuildManifest001Prealpha2(BuildManifest001Prealpha2<T>),
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum AnyBuildManifest {
+    BuildManifest001Prealpha1(BuildManifest001Prealpha1),
+    BuildManifest001Prealpha2(BuildManifest001Prealpha2),
 }
 
-impl<T: Clone + std::fmt::Debug + Serialize> AnyBuildManifest<T> {
+impl AnyBuildManifest {
     pub fn get_manifest_format(manifest: &Self) -> &String {
         match manifest {
             AnyBuildManifest::BuildManifest001Prealpha1(one) => &one.format,
@@ -61,8 +61,8 @@ pub struct Docker {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Config<T: Clone> {
-    pub k: HashMap<String, T>,
+pub struct Config {
+    pub k: HashMap<String, String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

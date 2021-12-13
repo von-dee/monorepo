@@ -18,8 +18,8 @@ impl ManifestType {
 }
 
 #[derive(Debug, Clone)]
-pub enum AnyManifest<T: Clone + std::fmt::Debug + serde::Serialize> {
+pub enum AnyManifest {
     Web3ApiManifest(Web3ApiManifest),
-    BuildManifest(BuildManifest<T>),
+    BuildManifest(BuildManifest),
     MetaManifest(MetaManifest),
 }

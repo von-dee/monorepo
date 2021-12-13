@@ -1,4 +1,3 @@
-use serde::Serialize;
 use std::collections::HashMap;
 use std::fs;
 
@@ -24,8 +23,8 @@ fn generate_schemas() -> BuildManifestSchemas {
     schemas
 }
 
-pub fn validate_build_manifest<T: Clone + std::fmt::Debug + Serialize>(
-    manifest: &AnyBuildManifest<T>,
+pub fn validate_build_manifest(
+    manifest: &AnyBuildManifest,
     ext_schema: Option<serde_json::Value>,
 ) -> Result<(), String> {
     let manifest_format = AnyBuildManifest::get_manifest_format(manifest);

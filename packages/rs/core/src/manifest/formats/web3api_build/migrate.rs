@@ -1,15 +1,11 @@
-use serde::Serialize;
-
 use super::migrators::prealpha_001_1_to_prealpha_001_2::migrate as migrate_prealpha_001_1_to_prealpha_001_2;
 use super::{AnyBuildManifest, BuildManifest, BuildManifestFormats, LATEST_BUILD_MANIFEST_FORMAT};
 use std::collections::HashMap;
 
-type MigratorMap<T> = HashMap<
-    String,
-    fn(manifest: &mut AnyBuildManifest<T>) -> Result<BuildManifest<T>, &'static str>,
->;
-fn generate_migrators<T: Clone + std::fmt::Debug + Serialize>() -> MigratorMap<T> {
-    let mut migrators: MigratorMap<T> = HashMap::new();
+type MigratorMap =
+    HashMap<String, fn(manifest: &mut AnyBuildManifest) -> Result<BuildManifest, &'static str>>;
+fn generate_migrators() -> MigratorMap {
+    let mut migrators: MigratorMap = HashMap::new();
     let _ = migrators.insert(
         "0.0.1-prealpha.1".to_string(),
         migrate_prealpha_001_1_to_prealpha_001_2,
@@ -17,10 +13,10 @@ fn generate_migrators<T: Clone + std::fmt::Debug + Serialize>() -> MigratorMap<T
     migrators
 }
 
-pub fn migrate_build_manifest<T: Clone + std::fmt::Debug + Serialize>(
-    manifest: &mut AnyBuildManifest<T>,
+pub fn migrate_build_manifest(
+    manifest: &mut AnyBuildManifest,
     to: &str,
-) -> Result<BuildManifest<T>, String> {
+) -> Result<BuildManifest, String> {
     let from = AnyBuildManifest::get_manifest_format(manifest);
     let to = BuildManifestFormats::get_format_name(to).unwrap();
 
