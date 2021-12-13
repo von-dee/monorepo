@@ -2,7 +2,7 @@ use super::{Config, Docker, LinkedPackages};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct BuildManifest<T: Clone> {
+pub struct BuildManifest<T: Clone + std::fmt::Debug + Serialize> {
     pub format: String,
     pub docker: Option<Docker>,
     pub config: Option<Config<T>>,
@@ -10,7 +10,7 @@ pub struct BuildManifest<T: Clone> {
     pub __type: String,
 }
 
-impl<T: Clone> Default for BuildManifest<T> {
+impl<T: Clone + std::fmt::Debug + Serialize> Default for BuildManifest<T> {
     fn default() -> BuildManifest<T> {
         BuildManifest {
             format: "0.0.1-prealpha.2".to_string(),

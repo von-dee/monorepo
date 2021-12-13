@@ -16,6 +16,7 @@ pub use prealpha_001_2::Web3ApiManifest as Web3ApiManifest001Prealpha2;
 pub use prealpha_001_3::Web3ApiManifest as Web3ApiManifest001Prealpha3;
 pub use prealpha_001_4::Web3ApiManifest as Web3ApiManifest001Prealpha4;
 pub use prealpha_001_5::Web3ApiManifest as Web3ApiManifest001Prealpha5;
+pub use validate::validate_web3_api_manifest;
 
 pub type Web3ApiManifest = Web3ApiManifest001Prealpha5;
 

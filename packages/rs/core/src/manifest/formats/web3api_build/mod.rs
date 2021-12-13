@@ -11,6 +11,7 @@ pub mod validate;
 pub use migrate::migrate_build_manifest;
 pub use prealpha_001_1::BuildManifest as BuildManifest001Prealpha1;
 pub use prealpha_001_2::BuildManifest as BuildManifest001Prealpha2;
+pub use validate::validate_build_manifest;
 
 pub type BuildManifest<T> = BuildManifest001Prealpha2<T>;
 
@@ -37,12 +38,13 @@ impl BuildManifestFormats {
     }
 }
 
-pub enum AnyBuildManifest<T: Clone> {
+#[derive(Debug, Clone)]
+pub enum AnyBuildManifest<T: Clone + std::fmt::Debug + Serialize> {
     BuildManifest001Prealpha1(BuildManifest001Prealpha1<T>),
     BuildManifest001Prealpha2(BuildManifest001Prealpha2<T>),
 }
 
-impl<T: Clone> AnyBuildManifest<T> {
+impl<T: Clone + std::fmt::Debug + Serialize> AnyBuildManifest<T> {
     pub fn get_manifest_format(manifest: &Self) -> &String {
         match manifest {
             AnyBuildManifest::BuildManifest001Prealpha1(one) => &one.format,
