@@ -6,16 +6,13 @@ type MigratorMap<T> = HashMap<
     String,
     fn(manifest: &mut AnyBuildManifest<T>) -> Result<BuildManifest<T>, &'static str>,
 >;
-struct Migrator<T: Clone>(T);
-impl<T: Clone> Migrator<T> {
-    pub fn generate_migrators() -> MigratorMap<T> {
-        let mut migrators: MigratorMap<T> = HashMap::new();
-        let _ = migrators.insert(
-            "0.0.1-prealpha.1".to_string(),
-            migrate_prealpha_001_1_to_prealpha_001_2,
-        );
-        migrators
-    }
+fn generate_migrators<T: Clone>() -> MigratorMap<T> {
+    let mut migrators: MigratorMap<T> = HashMap::new();
+    let _ = migrators.insert(
+        "0.0.1-prealpha.1".to_string(),
+        migrate_prealpha_001_1_to_prealpha_001_2,
+    );
+    migrators
 }
 
 pub fn migrate_build_manifest<T: Clone>(
@@ -49,7 +46,7 @@ pub fn migrate_build_manifest<T: Clone>(
         ));
     }
 
-    let migrators = Migrator::generate_migrators();
+    let migrators = generate_migrators();
     let migrator = migrators.get(from.as_str());
     if migrator.is_none() {
         return Err(format!(

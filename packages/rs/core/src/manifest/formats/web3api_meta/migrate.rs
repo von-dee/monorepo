@@ -3,11 +3,9 @@ use std::collections::HashMap;
 
 type MigratorMap =
     HashMap<String, fn(manifest: &mut AnyMetaManifest) -> Result<MetaManifest, &'static str>>;
-struct Migrator;
-impl Migrator {
-    pub fn generate_migrators() -> MigratorMap {
-        HashMap::new()
-    }
+
+fn generate_migrators() -> MigratorMap {
+    HashMap::new()
 }
 
 pub fn migrate_meta_manifest(
@@ -39,7 +37,7 @@ pub fn migrate_meta_manifest(
         return Err(format!("Unrecognized MetaManifestFormat {}", from.as_str()));
     }
 
-    let migrators = Migrator::generate_migrators();
+    let migrators = generate_migrators();
     let migrator = migrators.get(from.as_str());
     if migrator.is_none() {
         return Err(format!(

@@ -11,28 +11,26 @@ use std::collections::HashMap;
 
 type MigratorMap =
     HashMap<String, fn(manifest: &mut AnyWeb3ApiManifest) -> Result<Web3ApiManifest, &'static str>>;
-struct Migrator;
-impl Migrator {
-    pub fn generate_migrators() -> MigratorMap {
-        let mut migrators: MigratorMap = HashMap::new();
-        let _ = migrators.insert(
-            "0.0.1-prealpha.1".to_string(),
-            migrate_prealpha_001_1_to_prealpha_001_5,
-        );
-        let _ = migrators.insert(
-            "0.0.1-prealpha.2".to_string(),
-            migrate_prealpha_001_2_to_prealpha_001_5,
-        );
-        let _ = migrators.insert(
-            "0.0.1-prealpha.3".to_string(),
-            migrate_prealpha_001_3_to_prealpha_001_5,
-        );
-        let _ = migrators.insert(
-            "0.0.1-prealpha.4".to_string(),
-            migrate_prealpha_001_4_to_prealpha_001_5,
-        );
-        migrators
-    }
+
+fn generate_migrators() -> MigratorMap {
+    let mut migrators: MigratorMap = HashMap::new();
+    let _ = migrators.insert(
+        "0.0.1-prealpha.1".to_string(),
+        migrate_prealpha_001_1_to_prealpha_001_5,
+    );
+    let _ = migrators.insert(
+        "0.0.1-prealpha.2".to_string(),
+        migrate_prealpha_001_2_to_prealpha_001_5,
+    );
+    let _ = migrators.insert(
+        "0.0.1-prealpha.3".to_string(),
+        migrate_prealpha_001_3_to_prealpha_001_5,
+    );
+    let _ = migrators.insert(
+        "0.0.1-prealpha.4".to_string(),
+        migrate_prealpha_001_4_to_prealpha_001_5,
+    );
+    migrators
 }
 
 pub fn migrate_web3_api_manifest(
@@ -68,7 +66,7 @@ pub fn migrate_web3_api_manifest(
         ));
     }
 
-    let migrators = Migrator::generate_migrators();
+    let migrators = generate_migrators();
     let migrator = migrators.get(from.as_str());
     if migrator.is_none() {
         return Err(format!(

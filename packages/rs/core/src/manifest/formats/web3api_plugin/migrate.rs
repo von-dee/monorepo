@@ -5,11 +5,8 @@ use std::collections::HashMap;
 
 type MigratorMap =
     HashMap<String, fn(manifest: &mut AnyPluginManifest) -> Result<PluginManifest, &'static str>>;
-struct Migrator;
-impl Migrator {
-    pub fn generate_migrators() -> MigratorMap {
-        HashMap::new()
-    }
+fn generate_migrators() -> MigratorMap {
+    HashMap::new()
 }
 
 pub fn migrate_plugin_manifest(
@@ -40,7 +37,7 @@ pub fn migrate_plugin_manifest(
         ));
     }
 
-    let migrators = Migrator::generate_migrators();
+    let migrators = generate_migrators();
     let migrator = migrators.get(from.as_str());
     if migrator.is_none() {
         return Err(format!(
