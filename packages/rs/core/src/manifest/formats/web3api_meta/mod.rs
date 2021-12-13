@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 pub use migrate::migrate_meta_manifest;
 pub use prealpha_001_1::MetaManifest as MetaManifest001Prealpha1;
+pub use validate::validate_web3_api_manifest;
 
 pub type MetaManifest = MetaManifest001Prealpha1;
 
@@ -30,6 +31,7 @@ impl MetaManifestFormats {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum AnyMetaManifest {
     MetaManifest001Prealpha1(MetaManifest001Prealpha1),
 }
