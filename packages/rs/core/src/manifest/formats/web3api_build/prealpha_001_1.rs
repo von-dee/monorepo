@@ -1,6 +1,7 @@
 use super::{Config, Docker};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BuildManifest<T: Clone> {
     pub format: String,
     pub docker: Option<Docker>,

@@ -3,6 +3,7 @@ pub mod migrate;
 pub mod prealpha_001_1;
 pub mod prealpha_001_3;
 pub mod validate;
+use serde::{Deserialize, Serialize};
 
 pub use migrate::migrate_plugin_manifest;
 pub use prealpha_001_1::PluginManifest as PluginManifest001Prealpha1;
@@ -35,14 +36,14 @@ pub enum AnyPluginManifest {
 }
 
 impl AnyPluginManifest {
-    pub fn get_manifest_format(manifest: &mut Self) -> &String {
+    pub fn get_manifest_format(manifest: &Self) -> &String {
         match manifest {
             AnyPluginManifest::PluginManifest001Prealpha1(one) => &one.format,
         }
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ImportRedirects {
     pub uri: String,
     pub schema: String,

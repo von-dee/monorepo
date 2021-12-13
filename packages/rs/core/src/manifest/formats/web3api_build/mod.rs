@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub mod deserialize;
@@ -42,7 +43,7 @@ pub enum AnyBuildManifest<T: Clone> {
 }
 
 impl<T: Clone> AnyBuildManifest<T> {
-    pub fn get_manifest_format(manifest: &mut Self) -> &String {
+    pub fn get_manifest_format(manifest: &Self) -> &String {
         match manifest {
             AnyBuildManifest::BuildManifest001Prealpha1(one) => &one.format,
             AnyBuildManifest::BuildManifest001Prealpha2(two) => &two.format,
@@ -50,19 +51,19 @@ impl<T: Clone> AnyBuildManifest<T> {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Docker {
     pub name: Option<String>,
     pub dockerfile: Option<String>,
     pub build_image_id: Option<String>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Config<T: Clone> {
     pub k: HashMap<String, T>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct LinkedPackages {
     pub name: String,
     pub path: String,

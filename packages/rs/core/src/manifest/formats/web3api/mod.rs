@@ -8,6 +8,8 @@ pub mod prealpha_001_4;
 pub mod prealpha_001_5;
 pub mod validate;
 
+use serde::{Deserialize, Serialize};
+
 pub use migrate::migrate_web3_api_manifest;
 pub use prealpha_001_1::Web3ApiManifest as Web3ApiManifest001Prealpha1;
 pub use prealpha_001_2::Web3ApiManifest as Web3ApiManifest001Prealpha2;
@@ -46,6 +48,7 @@ impl Web3ApiManifestFormats {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum AnyWeb3ApiManifest {
     Web3ApiManifest001Prealpha1(Web3ApiManifest001Prealpha1),
     Web3ApiManifest001Prealpha2(Web3ApiManifest001Prealpha2),
@@ -55,7 +58,7 @@ pub enum AnyWeb3ApiManifest {
 }
 
 impl AnyWeb3ApiManifest {
-    pub fn get_manifest_format(manifest: &mut Self) -> &String {
+    pub fn get_manifest_format(manifest: &Self) -> &String {
         match manifest {
             AnyWeb3ApiManifest::Web3ApiManifest001Prealpha1(one) => &one.format,
             AnyWeb3ApiManifest::Web3ApiManifest001Prealpha2(two) => &two.format,
@@ -66,7 +69,7 @@ impl AnyWeb3ApiManifest {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Modules {
     pub mutation: Option<Mutation>,
     pub query: Option<Query>,
@@ -81,30 +84,30 @@ impl Default for Modules {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Mutation {
     pub schema: Schema,
     pub module: Module,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Query {
     pub schema: Schema,
     pub module: Module,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Module {
     pub language: String,
     pub file: String,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Schema {
     pub file: String,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ImportRedirects {
     pub uri: String,
     pub schema: String,

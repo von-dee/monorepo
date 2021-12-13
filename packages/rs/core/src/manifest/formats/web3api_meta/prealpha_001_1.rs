@@ -1,6 +1,7 @@
 use super::{Links, Queries};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MetaManifest {
     pub format: String,
     pub name: String,

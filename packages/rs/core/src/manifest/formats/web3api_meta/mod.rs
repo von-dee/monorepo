@@ -2,6 +2,7 @@ pub mod deserialize;
 pub mod migrate;
 pub mod prealpha_001_1;
 pub mod validate;
+use serde::{Deserialize, Serialize};
 
 pub use migrate::migrate_meta_manifest;
 pub use prealpha_001_1::MetaManifest as MetaManifest001Prealpha1;
@@ -34,21 +35,21 @@ pub enum AnyMetaManifest {
 }
 
 impl AnyMetaManifest {
-    pub fn get_manifest_format(manifest: &mut Self) -> &String {
+    pub fn get_manifest_format(manifest: &Self) -> &String {
         match manifest {
             AnyMetaManifest::MetaManifest001Prealpha1(one) => &one.format,
         }
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Links {
     pub name: String,
     pub icon: Option<String>,
     pub url: String,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Queries {
     pub name: String,
     pub description: Option<String>,

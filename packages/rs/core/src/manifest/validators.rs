@@ -13,7 +13,6 @@ pub fn file<T: ToString>(path: T) -> bool {
     result
 }
 
-// This may not be necessary
 pub fn docker_image_name<T: ToString>(name: T) -> bool {
     let name = name.to_string();
     !name.is_empty()

@@ -1,6 +1,7 @@
 use super::ImportRedirects;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PluginManifest {
     pub format: String,
     pub language: String,

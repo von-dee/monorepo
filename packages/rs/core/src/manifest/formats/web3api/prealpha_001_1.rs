@@ -1,6 +1,7 @@
 use super::{ImportRedirects, Module, Mutation, Query};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Web3ApiManifest {
     pub format: String,
     pub description: Option<String>,
