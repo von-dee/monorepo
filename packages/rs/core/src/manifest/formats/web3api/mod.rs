@@ -49,7 +49,7 @@ impl Web3ApiManifestFormats {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum AnyWeb3ApiManifest {
     Web3ApiManifest001Prealpha1(Web3ApiManifest001Prealpha1),
     Web3ApiManifest001Prealpha2(Web3ApiManifest001Prealpha2),
