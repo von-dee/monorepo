@@ -20,7 +20,7 @@ fn generate_schemas() -> MetaManifestSchemas {
     schemas
 }
 
-pub fn validate_web3_api_manifest(
+pub fn validate_meta_manifest(
     manifest: &AnyMetaManifest,
     ext_schema: Option<serde_json::Value>,
 ) -> Result<(), String> {

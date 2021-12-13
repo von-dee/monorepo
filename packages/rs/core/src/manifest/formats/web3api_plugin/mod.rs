@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 pub use migrate::migrate_plugin_manifest;
 pub use prealpha_001_1::PluginManifest as PluginManifest001Prealpha1;
+pub use validate::validate_plugin_manifest;
 
 pub type PluginManifest = PluginManifest001Prealpha1;
 
@@ -31,6 +32,7 @@ impl PluginManifestFormats {
     }
 }
 
+#[derive(Clone, Debug)]
 pub enum AnyPluginManifest {
     PluginManifest001Prealpha1(PluginManifest001Prealpha1),
 }
