@@ -1,0 +1,7 @@
+format: 0.0.1-prealpha.1
+language: dapp/typescript
+apis:
+  - uri: ens/uniswap.web3api.eth
+    namespace: Uniswap
+  - uri: ens/uniswap.web3api.eth
+    namespace: Uniswap

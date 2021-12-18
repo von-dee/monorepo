@@ -1,0 +1,8 @@
+- create "dapp" project test directory
+- should implement things using the plugin's method, or should we use the dapp method? which one is better?
+- web3api.dapp.yaml manifest file
+- - list all URIs you want to generate types for
+- match UX to w3 plugin codegen experience
+- integrate the CLI command into other projects (templates, client, core, demos, integrations, etc) after release
+- Issue: create separate CLI sub-sections (wrapper, dapp, plugin) `polywrap wrapper build`
+- Issue: implement `w3 plugin codegen` using the same approach as the dapp codegen?
