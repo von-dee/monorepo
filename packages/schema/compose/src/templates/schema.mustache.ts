@@ -15,7 +15,7 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
   type: "{{type}}",
   uri: "{{uri}}",
   namespace: "{{namespace}}"
-){{/capabilities}}{{/capabilities.length}} {
+){{/capabilities}}{{/capabilities.length}}{{#methods.length}} {
   {{#methods}}{{#comment}}
   """
   {{comment}}
@@ -34,15 +34,15 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
 
   {{/last}}
   {{/methods}}
-}
+}{{/methods.length}}
 
 {{/queryTypes}}
-{{#objectTypes}}{{#comment}}
+{{#envTypes.query.client}}{{#comment}}
 """
 {{comment}}
 """
 {{/comment}}
-type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} &{{/last}}{{/interfaces}}{{/interfaces.length}} {
+type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} &{{/last}}{{/interfaces}}{{/interfaces.length}}{{#properties.length}} {
   {{#properties}}{{#comment}}
   """
   {{comment}}
@@ -50,7 +50,71 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
   {{/comment}}
   {{name}}: {{toGraphQLType}}
   {{/properties}}
-}
+}{{/properties.length}}
+
+{{/envTypes.query.client}}
+{{#envTypes.query.sanitized}}{{#comment}}
+"""
+{{comment}}
+"""
+{{/comment}}
+type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} &{{/last}}{{/interfaces}}{{/interfaces.length}}{{#properties.length}} {
+  {{#properties}}{{#comment}}
+  """
+  {{comment}}
+  """
+  {{/comment}}
+  {{name}}: {{toGraphQLType}}
+  {{/properties}}
+}{{/properties.length}}
+
+{{/envTypes.query.sanitized}}
+{{#envTypes.mutation.client}}{{#comment}}
+"""
+{{comment}}
+"""
+{{/comment}}
+type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} &{{/last}}{{/interfaces}}{{/interfaces.length}}{{#properties.length}} {
+  {{#properties}}{{#comment}}
+  """
+  {{comment}}
+  """
+  {{/comment}}
+  {{name}}: {{toGraphQLType}}
+  {{/properties}}
+}{{/properties.length}}
+
+{{/envTypes.mutation.client}}
+{{#envTypes.mutation.sanitized}}{{#comment}}
+"""
+{{comment}}
+"""
+{{/comment}}
+type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} &{{/last}}{{/interfaces}}{{/interfaces.length}}{{#properties.length}} {
+  {{#properties}}{{#comment}}
+  """
+  {{comment}}
+  """
+  {{/comment}}
+  {{name}}: {{toGraphQLType}}
+  {{/properties}}
+}{{/properties.length}}
+
+{{/envTypes.mutation.sanitized}}
+{{#objectTypes}}{{#comment}}
+"""
+{{comment}}
+"""
+{{/comment}}
+type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} &{{/last}}{{/interfaces}}{{/interfaces.length}}{{#properties.length}} {
+  {{#properties}}{{#comment}}
+  """
+  {{comment}}
+  """
+  {{/comment}}
+  {{name}}: {{toGraphQLType}}
+  {{/properties}}
+}{{/properties.length}}
 
 {{/objectTypes}}
 {{#enumTypes}}{{#comment}}
@@ -76,7 +140,7 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
   uri: "{{uri}}",
   namespace: "{{namespace}}",
   nativeType: "{{nativeType}}"
-) {{#isInterface}}@enabled_interface {{/isInterface}}{
+){{#isInterface}} @enabled_interface{{/isInterface}}{{#methods.length}} {
   {{#methods}}{{#comment}}
   """
   {{comment}}
@@ -95,7 +159,7 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
 
   {{/last}}
   {{/methods}}
-}
+}{{/methods.length}}
 
 {{/importedQueryTypes}}
 ### Imported Queries END ###
@@ -111,7 +175,7 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
   uri: "{{uri}}",
   namespace: "{{namespace}}",
   nativeType: "{{nativeType}}"
-) {
+){{#properties.length}} {
   {{#properties}}{{#comment}}
   """
   {{comment}}
@@ -119,7 +183,7 @@ type {{type}}{{#interfaces.length}} implements{{#interfaces}} {{type}}{{^last}} 
   {{/comment}}
   {{name}}: {{toGraphQLType}}
   {{/properties}}
-}
+}{{/properties.length}}
 
 {{/importedObjectTypes}}
 

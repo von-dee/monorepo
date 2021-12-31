@@ -1,3 +1,41 @@
+# Web3API 0.0.1-prealpha.59
+## Features
+* Web3APIs can now be configured via environment variables. Documentation will be created soon. Initial details on this features specification can be found [here](https://github.com/polywrap/monorepo/issues/140).
+
+# Web3API 0.0.1-prealpha.58
+## Features
+* `@web3api/client-js`: Added `noDecode` invocation option.
+* `@web3api/client-js`: Added `noDefaults` constructor option.
+
+## Bugs
+* `@web3api/ethereum-plugin-js`: The `encodeParams` now properly parses arguments of type Array & Tuple.
+
+# Web3API 0.0.1-prealpha.57
+## Features
+* `@web3api/cli`: CLI command middleware support has been added. The first use-cases implemented are to help ensure Docker is available to the CLI instance, and not in-use by another CLI instance.
+* `@web3api/client-js`: Query-time configuration overrides have been added, allowing developers to define new configurations without having to re-create the client instance.
+
+## Bugs
+* `@web3api/asyncify-js`: Fixed issue [#570](https://github.com/polywrap/monorepo/issues/570) by using a node-version-agnostic way of indexing into the Uint8Array buffer.
+
+# Web3API 0.0.1-prealpha.56
+## Bugs
+* `@web3api/ethereum-plugin-js`: The encodeFunction now support array & object arg types.
+
+# Web3API 0.0.1-prealpha.55
+## Bugs
+* `@web3api/schema-compose`: Properly support empty schema types.
+* `@web3api/asyncify-js`: Fixed a low-level inconsistency between Wasm modules when using imported memory. More details [here](https://github.com/polywrap/monorepo/issues/561).
+* `@web3api/schema-bind`: Fixed issue where imports were inconsistent between `serialization.ts` assemblyscript files, and some necessary imports were missing.
+
+# Web3API 0.0.1-prealpha.54
+## Features
+* `@web3api/ethereum-plugin-js`: Added `getNetwork` to the Ethereum plugin's `Query` module.
+
+# Web3API 0.0.1-prealpha.53
+## Features
+* `as-bigint` upgraded to version `0.4.0`. Improvements made found [here](https://github.com/polywrap/monorepo/pull/552).
+
 # Web3API 0.0.1-prealpha.52
 ## Features
 * Querying an interface implementation's modules given its URI is now supported within Wasm.

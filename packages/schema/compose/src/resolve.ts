@@ -33,6 +33,7 @@ import {
   GenericDefinition,
   isKind,
   header,
+  AnyDefinition,
   InterfaceImplementedDefinition,
   ObjectRef,
   EnumRef,
@@ -44,6 +45,9 @@ import {
   createCapability,
   QueryModuleCapability,
   QueryModuleCapabilityMap,
+  createEnvDefinition,
+  createObjectDefinition,
+  envTypes,
 } from "@web3api/schema-parse";
 
 type ImplementationWithInterfaces = {
@@ -165,6 +169,10 @@ export async function resolveImportsAndParseSchemas(
     importedEnumTypes: [],
     importedObjectTypes: [],
     importedQueryTypes: [],
+    envTypes: {
+      mutation: createEnvDefinition({}),
+      query: createEnvDefinition({}),
+    },
   };
 
   const externalImports = await resolveExternalImports(
@@ -206,8 +214,17 @@ export async function resolveImportsAndParseSchemas(
 
   newSchema = resolveInterfaces(newSchema, implementationsWithInterfaces);
 
+  //Replace types that have empty curly brackets with types that have no curly brackets
+  //because GraphQL parser doesn't support empty curly brackets but supports no curly brackets
+  newSchema = newSchema.replace(
+    new RegExp(`(type\\s+${TYPE_NAME_REGEX}[^{]*){\\s*}`, "g"),
+    "$1"
+  );
+
   // Parse the newly formed schema
-  return parseSchema(newSchema);
+  const typeInfo = parseSchema(newSchema);
+
+  return typeInfo;
 }
 
 interface Namespaced {
@@ -465,8 +482,8 @@ function addCapabilityDirective(
     for (const capability of capabilities) {
       const typeCapture =
         module === "mutation"
-          ? /type[ \n\t]*Mutation[ \n\t]*([^{]*)[ \n\t]*{/g
-          : /type[ \n\t]*Query[ \n\t]*([^{]*)[ \n\t]*{/g;
+          ? /type[ \n\t]+Mutation[ \n\t]+([^{]*)[ \n\t]*{/g
+          : /type[ \n\t]+Query[ \n\t]+([^{]*)[ \n\t]*{/g;
 
       const replacementQueryStr = `type ${
         module === "mutation" ? "Mutation" : "Query"
@@ -869,101 +886,117 @@ async function resolveLocalImports(
         throw Error(
           `Importing query types from local schemas is prohibited. Tried to import from ${path}.`
         );
-      } else {
-        let type: GenericDefinition | undefined;
-        let visitorFunc: Function;
-
-        if (
-          localTypeInfo.objectTypes.findIndex(
-            (type) => type.type === importedType
-          ) > -1
-        ) {
-          visitorFunc = visitObjectDefinition;
-          type = localTypeInfo.objectTypes.find(
-            (type) => type.type === importedType
-          );
-        } else {
-          visitorFunc = visitEnumDefinition;
-          type = localTypeInfo.enumTypes.find(
-            (type) => type.type === importedType
-          );
-        }
-
-        if (!type) {
-          throw Error(
-            `Cannot find type "${importedType}" in the schema at ${path}.\nFound: [ ${localTypeInfo.objectTypes.map(
-              (type) => type.type + " "
-            )}]`
-          );
-        }
-
-        typesToImport[type.type] = type;
-
-        const findImport = (
-          def: GenericDefinition,
-          rootTypes: EnumOrObject[]
-        ) => {
-          // Skip objects that we've already processed
-          if (typesToImport[def.type]) {
-            return def;
-          }
-
-          // Find the ObjectDefinition
-          const idx = rootTypes.findIndex((obj) => obj.type === def.type);
-
-          if (idx === -1) {
-            throw Error(
-              `resolveLocalImports: Cannot find the requested type within the TypeInfo.\n` +
-                `Type: ${def.type}\nTypeInfo: ${JSON.stringify(localTypeInfo)}`
-            );
-          }
-
-          const objectDefinition = rootTypes[idx];
-
-          if (!visitedTypes[objectDefinition.type]) {
-            if (objectDefinition.kind === DefinitionKind.Object) {
-              visitedTypes[objectDefinition.type] = true;
-              visitType(objectDefinition);
-            }
-          }
-
-          typesToImport[def.type] = {
-            ...objectDefinition,
-            name: null,
-            required: null,
-          };
-          return def;
-        };
-
-        const visitedTypes: Record<string, boolean> = {};
-
-        const visitType = (type: GenericDefinition) => {
-          visitorFunc(type, {
-            enter: {
-              ObjectRef: (def: ObjectRef) => {
-                return findImport(def, [
-                  ...localTypeInfo.objectTypes,
-                  ...localTypeInfo.importedObjectTypes,
-                ]);
-              },
-              EnumRef: (def: EnumRef) => {
-                return findImport(def, [
-                  ...localTypeInfo.enumTypes,
-                  ...localTypeInfo.importedEnumTypes,
-                ]);
-              },
-            },
-          });
-        };
-
-        visitedTypes[type.type] = true;
-        visitType(type);
       }
+
+      let type: GenericDefinition | undefined;
+      let visitorFunc: Function;
+
+      const objectIdx = localTypeInfo.objectTypes.findIndex(
+        (type) => type.type === importedType
+      );
+
+      if (objectIdx > -1) {
+        visitorFunc = visitObjectDefinition;
+        type = localTypeInfo.objectTypes[objectIdx];
+      } else {
+        visitorFunc = visitEnumDefinition;
+        type = localTypeInfo.enumTypes.find(
+          (type) => type.type === importedType
+        );
+      }
+
+      if (!type) {
+        throw Error(
+          `Cannot find type "${importedType}" in the schema at ${path}.\nFound: [ ${localTypeInfo.objectTypes.map(
+            (type) => type.type + " "
+          )}]`
+        );
+      }
+
+      typesToImport[type.type] = type;
+
+      const findImport = (
+        def: GenericDefinition,
+        rootTypes: EnumOrObject[]
+      ) => {
+        // Skip objects that we've already processed
+        if (typesToImport[def.type]) {
+          return def;
+        }
+
+        // Find the ObjectDefinition
+        const idx = rootTypes.findIndex((obj) => obj.type === def.type);
+
+        if (idx === -1) {
+          throw Error(
+            `resolveLocalImports: Cannot find the requested type within the TypeInfo.\n` +
+              `Type: ${def.type}\nTypeInfo: ${JSON.stringify(localTypeInfo)}`
+          );
+        }
+
+        const objectDefinition = rootTypes[idx];
+
+        if (!visitedTypes[objectDefinition.type]) {
+          if (objectDefinition.kind !== DefinitionKind.Enum) {
+            visitedTypes[objectDefinition.type] = true;
+            visitType(objectDefinition);
+          }
+        }
+
+        typesToImport[def.type] = {
+          ...objectDefinition,
+          name: null,
+          required: null,
+        };
+        return def;
+      };
+
+      const visitedTypes: Record<string, boolean> = {};
+
+      const visitType = (type: GenericDefinition) => {
+        visitorFunc(type, {
+          enter: {
+            ObjectRef: (def: ObjectRef) => {
+              return findImport(def, [
+                ...localTypeInfo.objectTypes,
+                ...localTypeInfo.importedObjectTypes,
+              ]);
+            },
+            EnumRef: (def: EnumRef) => {
+              return findImport(def, [
+                ...localTypeInfo.enumTypes,
+                ...localTypeInfo.importedEnumTypes,
+              ]);
+            },
+            InterfaceImplementedDefinition: (
+              def: InterfaceImplementedDefinition
+            ) => {
+              return findImport(def, [
+                ...localTypeInfo.objectTypes,
+                ...localTypeInfo.importedObjectTypes,
+              ]);
+            },
+          },
+        });
+      };
+
+      visitedTypes[type.type] = true;
+      visitType(type);
     }
 
     // Add all imported types into the aggregate TypeInfo
     for (const importType of Object.keys(typesToImport)) {
-      if (isKind(typesToImport[importType], DefinitionKind.Object)) {
+      if (isKind(typesToImport[importType], DefinitionKind.ImportedObject)) {
+        if (
+          typeInfo.importedObjectTypes.findIndex(
+            (def) => def.type === importType
+          ) === -1
+        ) {
+          typeInfo.importedObjectTypes.push(
+            typesToImport[importType] as ImportedObjectDefinition
+          );
+        }
+      } else if (isKind(typesToImport[importType], DefinitionKind.Object)) {
         if (
           typeInfo.objectTypes.findIndex((def) => def.type === importType) ===
           -1
@@ -972,13 +1005,70 @@ async function resolveLocalImports(
             typesToImport[importType] as ObjectDefinition
           );
         }
-      } else {
+      } else if (
+        isKind(typesToImport[importType], DefinitionKind.ImportedEnum)
+      ) {
+        if (
+          typeInfo.importedEnumTypes.findIndex(
+            (def) => def.type === importType
+          ) === -1
+        ) {
+          typeInfo.importedEnumTypes.push(
+            typesToImport[importType] as ImportedEnumDefinition
+          );
+        }
+      } else if (isKind(typesToImport[importType], DefinitionKind.Enum)) {
         if (
           typeInfo.enumTypes.findIndex((def) => def.type === importType) === -1
         ) {
           typeInfo.enumTypes.push(typesToImport[importType] as EnumDefinition);
         }
       }
+    }
+  }
+}
+
+export function resolveEnvTypes(typeInfo: TypeInfo, mutation: boolean): void {
+  const genericEnvType = typeInfo.objectTypes.find(
+    (type) => type.type === "Env"
+  );
+  if (!genericEnvType) {
+    return;
+  }
+
+  const specificEnvType = mutation
+    ? typeInfo.envTypes.mutation
+    : typeInfo.envTypes.query;
+
+  if (!specificEnvType.sanitized) {
+    specificEnvType.sanitized = createObjectDefinition({
+      type: mutation ? envTypes.MutationEnv : envTypes.QueryEnv,
+    });
+  }
+
+  typeInfo.objectTypes = typeInfo.objectTypes.filter((type) => {
+    return type.type !== genericEnvType.type;
+  });
+
+  checkDuplicateEnvProperties(
+    specificEnvType.sanitized,
+    genericEnvType.properties
+  );
+  specificEnvType.sanitized.properties.push(...genericEnvType.properties);
+}
+
+export function checkDuplicateEnvProperties(
+  envType: ObjectDefinition,
+  genericEnvProperties: AnyDefinition[]
+): void {
+  const genericEnvPropertiesSet = new Set(
+    genericEnvProperties.map((genericProperty) => genericProperty.name)
+  );
+  for (const specificProperty of envType.properties) {
+    if (genericEnvPropertiesSet.has(specificProperty.name)) {
+      throw new Error(
+        `Type '${envType.type}' contains duplicate property '${specificProperty.name}' of type 'Env'`
+      );
     }
   }
 }

@@ -35,7 +35,7 @@ export default {
   alias: ["g"],
   description: intlMsg.commands_codegen_description(),
   run: async (toolbox: GluegunToolbox): Promise<void> => {
-    const { filesystem, parameters, print } = toolbox;
+    const { filesystem, parameters, print, middleware } = toolbox;
 
     const { h, c, m, i, o, e } = parameters.options;
     let {
@@ -59,8 +59,67 @@ export default {
       return;
     }
 
-    const { ipfsProvider, ethProvider } = await getCodegenProviders(ipfs);
-    const ensAddress: string | undefined = ens;
+    if (custom === true) {
+      const customScriptMissingPathMessage = intlMsg.commands_codegen_error_customScriptMissingPath(
+        {
+          option: "--custom",
+          argument: `<${pathStr}>`,
+        }
+      );
+      print.error(customScriptMissingPathMessage);
+      print.info(HELP);
+      return;
+    }
+
+    if (outputDir === true) {
+      const outputDirMissingPathMessage = intlMsg.commands_build_error_outputDirMissingPath(
+        {
+          option: "--output-dir",
+          argument: `<${pathStr}>`,
+        }
+      );
+      print.error(outputDirMissingPathMessage);
+      print.info(HELP);
+      return;
+    }
+
+    if (ens === true) {
+      const domStr = intlMsg.commands_codegen_error_domain();
+      const ensAddressMissingMessage = intlMsg.commands_build_error_testEnsAddressMissing(
+        {
+          option: "--ens",
+          argument: `<[${addrStr},]${domStr}>`,
+        }
+      );
+      print.error(ensAddressMissingMessage);
+      print.info(HELP);
+      return;
+    }
+
+    await middleware.run({
+      name: toolbox.command?.name,
+      options: { help, manifestPath, ipfs, outputDir, ens, custom },
+    });
+
+    let ipfsProvider: string | undefined;
+    let ethProvider: string | undefined;
+    let ensAddress: string | undefined = ens;
+
+    if (typeof ipfs === "string") {
+      // Custom IPFS provider
+      ipfsProvider = ipfs;
+    } else if (ipfs) {
+      // Dev-server IPFS provider
+      try {
+        const {
+          data: { ipfs, ethereum },
+        } = await axios.get("http://localhost:4040/providers");
+        ipfsProvider = ipfs;
+        ethProvider = ethereum;
+      } catch (e) {
+        // Dev server not found
+      }
+    }
 
     // Resolve generation file & output directories
     const customScript = custom && filesystem.resolve(custom);
