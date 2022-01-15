@@ -1,5 +1,4 @@
 pub mod common;
-pub mod entry;
 pub mod custom_type;
 pub use custom_type::CustomType;
 pub mod another_type;
