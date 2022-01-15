@@ -33,20 +33,9 @@
 //! - Unambiguous foreign function interfaces
 //! - Robust and battle-tested
 
-pub mod abort;
 pub mod big_int;
-pub mod debug;
-pub mod get_implementations;
-pub mod invoke;
 pub mod json;
-pub mod malloc;
 pub mod msgpack;
-pub mod subinvoke;
-
-pub use abort::*;
-pub use get_implementations::*;
-pub use invoke::*;
-pub use subinvoke::*;
 
 pub use big_int::BigInt;
 pub use json::JSON;
