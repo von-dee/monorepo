@@ -36,6 +36,7 @@
 pub mod big_int;
 pub mod json;
 pub mod msgpack;
+pub mod subinvoke;
 
 pub use big_int::BigInt;
 pub use json::JSON;
