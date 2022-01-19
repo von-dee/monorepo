@@ -44,15 +44,21 @@ describe("CancelablePromise", () => {
         resolve(true);
       }, 200);
     });
-    promise.then((value) => result = value);
-
     const cancelable = createCancelablePromise(promise);
-    cancelable.cancel();
+    cancelable.then((value) => result = value);
 
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve(true);
       }, 100);
+    });
+
+    cancelable.cancel();
+
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 200);
     });
 
     expect(result).toBe(false);
@@ -146,5 +152,28 @@ describe("CancelablePromise", () => {
 
     expect(results.length).toBe(1);
     expect(results[0]).toBe("first");
+  });
+
+  it("works when constructed with an async function", async () => {
+    let result = undefined;
+    const cancelable = new CancelablePromise<void>(async (resolve) => {
+      result = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve("A");
+        }, 200);
+      });
+
+      result = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve("B");
+        }, 200);
+      });
+
+      resolve();
+    });
+
+    await cancelable;
+
+    expect(result).toBe("B");
   });
 });
