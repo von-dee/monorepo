@@ -178,7 +178,6 @@ export class WasmWeb3Api extends Api {
     try {
       const { module: invokableModule, method, noDecode } = options;
       const input = options.input || {};
-      const wasm = await this._getWasmModule(invokableModule, client);
 
       const state: State = {
         invoke: {},
@@ -202,70 +201,96 @@ export class WasmWeb3Api extends Api {
         );
       };
 
-      const onCancel = () => {
+      const onCancelHandler = () => {
         state.invoke.canceled = true;
         state.subinvoke.cancel && state.subinvoke.cancel();
       };
 
-      const memory = AsyncWasmInstance.createMemory({ module: wasm });
-      const instance = await AsyncWasmInstance.createInstance({
-        module: wasm,
-        imports: createImports({
-          state,
-          client,
-          memory,
-          abort,
-        }),
-        requiredExports: WasmWeb3Api.requiredExports,
-      });
-
-      const exports = instance.exports as W3Exports;
-
-      await this._sanitizeAndLoadEnv(invokableModule, state, exports);
-
-      const result = await exports._w3_invoke(
-        state.method.length,
-        state.args.byteLength
-      );
-
-      const invokeResult = this._processInvokeResult(state, result, abort);
-
-      switch (invokeResult.type) {
-        case "InvokeError": {
-          throw Error(
-            `WasmWeb3Api: invocation exception encountered.\n` +
-              `uri: ${this._uri.uri}\nmodule: ${invokableModule}\n` +
-              `method: ${method}\n` +
-              `input: ${JSON.stringify(input, null, 2)}\n` +
-              `exception: ${invokeResult.invokeError}`
+      return new CancelablePromise<InvokeApiResult<unknown | ArrayBuffer>>(
+        (_, __, onCancel) => onCancel(onCancelHandler)
+      )
+      .then(
+        () => this._getWasmModule(invokableModule, client)
+      )
+      .then(
+        (wasm: ArrayBuffer) => {
+          const memory = AsyncWasmInstance.createMemory({ module: wasm });
+          return AsyncWasmInstance.createInstance({
+            module: wasm,
+            imports: createImports({
+              state,
+              client,
+              memory,
+              abort,
+            }),
+            requiredExports: WasmWeb3Api.requiredExports,
+          });
+        }
+      )
+      .then(
+        async (instance: AsyncWasmInstance) => {
+          const exports = instance.exports as W3Exports;
+          await this._sanitizeAndLoadEnv(invokableModule, state, exports);
+          return exports;
+        }
+      )
+      .then(
+        (exports: W3Exports) => {
+          return exports._w3_invoke(
+            state.method.length,
+            state.args.byteLength
           );
         }
-        case "InvokeResult": {
-          if (noDecode) {
-            return {
-              data: invokeResult.invokeResult,
-            } as InvokeApiResult<ArrayBuffer>;
-          }
+      )
+      .then(
+        (result: boolean) => {
+          const invokeResult = this._processInvokeResult(state, result, abort);
 
-          try {
-            return {
-              data: MsgPack.decode(invokeResult.invokeResult as ArrayBuffer),
-            } as InvokeApiResult<unknown>;
-          } catch (err) {
-            throw Error(
-              `WasmWeb3Api: Failed to decode query result.\nResult: ${JSON.stringify(
-                invokeResult.invokeResult
-              )}\nError: ${err}`
-            );
+          switch (invokeResult.type) {
+            case "InvokeError": {
+              throw Error(
+                `WasmWeb3Api: invocation exception encountered.\n` +
+                  `uri: ${this._uri.uri}\nmodule: ${invokableModule}\n` +
+                  `method: ${method}\n` +
+                  `input: ${JSON.stringify(input, null, 2)}\n` +
+                  `exception: ${invokeResult.invokeError}`
+              );
+            }
+            case "InvokeResult": {
+              if (noDecode) {
+                return {
+                  data: invokeResult.invokeResult,
+                } as InvokeApiResult<ArrayBuffer>;
+              }
+
+              try {
+                return {
+                  data: MsgPack.decode(invokeResult.invokeResult as ArrayBuffer),
+                } as InvokeApiResult<unknown>;
+              } catch (err) {
+                throw Error(
+                  `WasmWeb3Api: Failed to decode query result.\nResult: ${JSON.stringify(
+                    invokeResult.invokeResult
+                  )}\nError: ${err}`
+                );
+              }
+            }
+            case "InvokeCanceled": {
+              // TODO: this + add "reason" to cancelable promise
+            }
+            default: {
+              throw Error(`WasmWeb3Api: Unknown state "${state}"`);
+            }
           }
         }
-        case "InvokeCanceled": {
-          // TODO: this + add "reason" to cancelable promise
+      )
+      .catch(
+        (error) => {
+          return {
+            error,
+          };
         }
-        default: {
-          throw Error(`WasmWeb3Api: Unknown state "${state}"`);
-        }
-      }
+      );
     } catch (error) {
       return {
         error,
