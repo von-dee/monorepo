@@ -39,9 +39,15 @@ type CustomType {
 type AnotherType {
   prop: String
   circular: CustomType
+  const: String
 }
 
 enum CustomEnum {
   STRING
   BYTES
+}
+
+type Env {
+  prop: String!
+  optProp: String
 }

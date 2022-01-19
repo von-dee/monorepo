@@ -7,16 +7,40 @@ import {
   createArrayDefinition,
   createObjectPropertyDefinition,
   createObjectDefinition,
-  TypeInfo,
   createEnumPropertyDefinition,
   createImportedQueryDefinition,
   createImportedObjectDefinition,
   createImportedEnumDefinition,
   createInterfaceImplementedDefinition,
-  createObjectRef
+  createObjectRef,
+  createEnvDefinition,
+  createTypeInfo,
+  AnyDefinition,
+  TypeInfo,
 } from "@web3api/schema-parse";
 
 export const typeInfo: TypeInfo = {
+  ...createTypeInfo(),
+  envTypes: {
+    query: createEnvDefinition({}),
+    mutation: createEnvDefinition({
+      sanitized: {
+        ...createObjectDefinition({ type: "MutationEnv" }),
+        properties: [
+          {
+            ...createScalarPropertyDefinition({ name: "bar", type: "Int", required: false }),
+            first: true,
+            last: null,
+          } as AnyDefinition,
+          {
+            ...createScalarPropertyDefinition({ name: "foo", type: "String", required: true }),
+            first: null,
+            last: true,
+          } as AnyDefinition,
+        ],
+      }
+    }),
+  },
   enumTypes: [],
   queryTypes: [
     {
@@ -270,7 +294,8 @@ export const typeInfo: TypeInfo = {
               required: false
             })
           })
-        })
+        }),
+        createObjectPropertyDefinition({ name: "anotherLocal", type: "AnotherLocal", required: true }),
       ],
     },
     {
@@ -290,7 +315,15 @@ export const typeInfo: TypeInfo = {
       properties: [
         createScalarPropertyDefinition({ name: "prop", type: "String", required: true }),
       ],
-    }
+    },
+    {
+      ...createObjectDefinition({
+        type: "AnotherLocal",
+      }),
+      properties: [
+        createScalarPropertyDefinition({ name: "prop", type: "String", required: true }),
+      ],
+    },
   ],
   importedQueryTypes: [
     {
@@ -298,8 +331,9 @@ export const typeInfo: TypeInfo = {
         uri: "test.eth",
         namespace: "Namespace",
         nativeType: "Query",
+        isInterface: false,
         type: "Namespace_Query",
-        comment: "Query comment"
+        comment: "Query comment",
       }),
       methods: [
         {
@@ -387,8 +421,9 @@ export const typeInfo: TypeInfo = {
         uri: "test.eth",
         namespace: "Namespace",
         nativeType: "Mutation",
+        isInterface: false,
         type: "Namespace_Mutation",
-        comment: "Mutation comment"
+        comment: "Mutation comment",
       }),
       methods: [
         {
@@ -529,8 +564,9 @@ export const typeInfo: TypeInfo = {
       ...createImportedQueryDefinition({
         uri: "just.mutation.eth",
         namespace: "JustMutation",
+        isInterface: false,
         nativeType: "Mutation",
-        type: "JustMutation_Mutation"
+        type: "JustMutation_Mutation",
       }),
       methods: [
         {
@@ -568,8 +604,9 @@ export const typeInfo: TypeInfo = {
         uri: "test-interface.eth",
         namespace: "Interface",
         nativeType: "Mutation",
+        isInterface: false,
         type: "Interface_Mutation",
-        comment: "Mutation comment"
+        comment: "Mutation comment",
       }),
       methods: [
         {
