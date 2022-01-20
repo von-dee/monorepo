@@ -235,12 +235,12 @@ export class WasmWeb3Api extends Api {
         }
       )
       .then(
-        (exports: W3Exports) => {
-          return exports._w3_invoke(
+        (exports: W3Exports) => (
+          exports._w3_invoke(
             state.method.length,
             state.args.byteLength
-          );
-        }
+          )
+        )
       )
       .then(
         (result: boolean) => {
@@ -285,11 +285,7 @@ export class WasmWeb3Api extends Api {
         }
       )
       .catch(
-        (error) => {
-          return {
-            error,
-          };
-        }
+        (error) => ({ error })
       );
     } catch (error) {
       return {

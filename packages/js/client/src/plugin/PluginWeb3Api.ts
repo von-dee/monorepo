@@ -14,6 +14,7 @@ import {
   GetFileOptions,
   Env,
   InvokableModules,
+  CancelablePromise,
 } from "@web3api/core-js";
 import * as MsgPack from "@msgpack/msgpack";
 import { Tracer } from "@web3api/tracing-js";
@@ -63,7 +64,7 @@ export class PluginWeb3Api extends Api {
   public async invoke<TData = unknown>(
     options: InvokeApiOptions<Uri>,
     client: Client
-  ): Promise<InvokeApiResult<TData>> {
+  ): CancelablePromise<InvokeApiResult<TData>> {
     try {
       const { module, method, resultFilter } = options;
       const input = options.input || {};
@@ -76,19 +77,6 @@ export class PluginWeb3Api extends Api {
 
       if (!pluginModule[method]) {
         throw new Error(`PluginWeb3Api: method "${method}" not found.`);
-      }
-
-      let env = this._getModuleClientEnv(module);
-      if (isValidEnv(env)) {
-        if (pluginModule["sanitizeEnv"]) {
-          env = (await executeMaybeAsyncFunction(
-            pluginModule["sanitizeEnv"],
-            env,
-            client
-          )) as Record<string, unknown>;
-        }
-
-        this._getInstance().loadEnv(env, module);
       }
 
       let jsInput: Record<string, unknown>;
@@ -110,57 +98,95 @@ export class PluginWeb3Api extends Api {
         jsInput = input;
       }
 
-      try {
-        const result = (await executeMaybeAsyncFunction(
-          pluginModule[method],
-          jsInput,
-          client
-        )) as TData;
-
-        Tracer.addEvent("unfiltered-result", result);
-
-        if (result !== undefined) {
-          let data = result as unknown;
-
-          if (process.env.TEST_PLUGIN) {
-            // try to encode the returned result,
-            // ensuring it's msgpack compliant
-            try {
-              MsgPack.encode(data);
-            } catch (e) {
-              throw Error(
-                `TEST_PLUGIN msgpack encode failure.` +
-                  `uri: ${this._uri.uri}\nmodule: ${module}\n` +
-                  `method: ${method}\n` +
-                  `input: ${JSON.stringify(jsInput, null, 2)}\n` +
-                  `result: ${JSON.stringify(data, null, 2)}\n` +
-                  `exception: ${e}`
-              );
-            }
-          }
-
-          if (resultFilter) {
-            data = filterResults(result, resultFilter);
-          }
-
-          Tracer.addEvent("Filtered result", data);
-
-          return {
-            data: data as TData,
-          };
-        } else {
-          return {};
-        }
-      } catch (e) {
-        throw Error(
-          `PluginWeb3Api: invocation exception encountered.\n` +
-            `uri: ${this._uri.uri}\nmodule: ${module}\n` +
-            `method: ${method}\nresultFilter: ${resultFilter}\n` +
-            `input: ${JSON.stringify(jsInput, null, 2)}\n` +
-            `modules: ${JSON.stringify(modules, null, 2)}\n` +
-            `exception: ${e.message}`
-        );
+      const onCancelHandler = () => {
+        // TODO: check to see if there's been a sub-invocation
+        // and if so call cancel on it
       }
+
+      return new CancelablePromise<InvokeApiResult<TData>>(
+        (_, __, onCancel) => onCancel(onCancelHandler)
+      )
+      .then(
+        async () => {
+          let env = this._getModuleClientEnv(module);
+          if (isValidEnv(env)) {
+            if (pluginModule["sanitizeEnv"]) {
+              env = (await executeMaybeAsyncFunction(
+                pluginModule["sanitizeEnv"],
+                env,
+                client
+              )) as Record<string, unknown>;
+            }
+
+            this._getInstance().loadEnv(env, module);
+          }
+        }
+      )
+      .catch(
+        (error) => ({ error })
+      )
+      .then(
+        () => (
+          executeMaybeAsyncFunction(
+            pluginModule[method],
+            jsInput,
+            client
+          ) as Promise<TData>
+        )
+      )
+      .catch(
+        (e) => ({
+          error: new Error(
+            `PluginWeb3Api: invocation exception encountered.\n` +
+              `uri: ${this._uri.uri}\nmodule: ${module}\n` +
+              `method: ${method}\nresultFilter: ${resultFilter}\n` +
+              `input: ${JSON.stringify(jsInput, null, 2)}\n` +
+              `modules: ${JSON.stringify(modules, null, 2)}\n` +
+              `exception: ${e.message}`
+          )
+        })
+      )
+      .then(
+        (result: TData) => {
+          Tracer.addEvent("unfiltered-result", result);
+
+          if (result !== undefined) {
+            let data = result as unknown;
+
+            if (process.env.TEST_PLUGIN) {
+              // try to encode the returned result,
+              // ensuring it's msgpack compliant
+              try {
+                MsgPack.encode(data);
+              } catch (e) {
+                throw Error(
+                  `TEST_PLUGIN msgpack encode failure.` +
+                    `uri: ${this._uri.uri}\nmodule: ${module}\n` +
+                    `method: ${method}\n` +
+                    `input: ${JSON.stringify(jsInput, null, 2)}\n` +
+                    `result: ${JSON.stringify(data, null, 2)}\n` +
+                    `exception: ${e}`
+                );
+              }
+            }
+
+            if (resultFilter) {
+              data = filterResults(result, resultFilter);
+            }
+
+            Tracer.addEvent("Filtered result", data);
+
+            return {
+              data: data as TData,
+            };
+          } else {
+            return {};
+          }
+        }
+      )
+      .catch(
+        (error) => ({ error })
+      );
     } catch (error) {
       return {
         error,
